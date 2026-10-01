@@ -148,6 +148,8 @@ public final class AudioEngine {
     public static String deviceName(AudioDeviceInfo device) {
         String name = device.getProductName().toString().trim();
         if(device.getType()==AudioDeviceInfo.TYPE_BUILTIN_MIC) return "Phone microphone";
+        if(device.getType()==AudioDeviceInfo.TYPE_BUILTIN_SPEAKER) return "Phone speaker";
+        if(device.getType()==AudioDeviceInfo.TYPE_BUILTIN_EARPIECE) return "Phone earpiece";
         return name.isEmpty() ? "Audio device" : name;
     }
 }

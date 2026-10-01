@@ -24,8 +24,36 @@ public class SignalProcessorTest {
         Random random=new Random(2026);
         for(int sampleRate:new int[]{44100,48000}) {
             SignalProcessor stress=new SignalProcessor(sampleRate);
-            EffectSettings extreme=new EffectSettings(true,true,-6,6,1,0.5f,600);
+            EffectSettings extreme=new EffectSettings(true,true,-6,6,12,12,12,1,true,1,0.5f,600);
             for(int n=0;n<250;n++){for(int i=0;i<in.length;i++)in[i]=(short)random.nextInt();stress.process(in,BLOCK,out,3,n%31==0,extreme);for(int i=0;i<BLOCK;i++){check(out[i*2]==out[i*2+1],"FX stereo equality");check(Math.abs((int)out[i*2])<=29490,"FX overload bounded");}}
+        }
+        for(int sampleRate:new int[]{44100,48000}) {
+            for(int band=0;band<3;band++){
+                double hz=band==0?60:band==1?1500:8000;
+                short[] sine=sine(sampleRate,hz,1000);
+                double reference=rms(render(sine,EffectSettings.natural(),sampleRate));
+                float b=band==0?6:0,m=band==1?6:0,t=band==2?6:0;
+                double boost=rms(render(sine,new EffectSettings(true,false,0,0,b,m,t,0,false,0,0,250),sampleRate))/reference;
+                double cut=rms(render(sine,new EffectSettings(true,false,0,0,-b,-m,-t,0,false,0,0,250),sampleRate))/reference;
+                check(boost>1.75&&boost<2.1,"EQ boost at band "+band+": "+boost);
+                check(cut>0.47&&cut<0.58,"EQ cut at band "+band+": "+cut);
+            }
+            short[] quietSpeech=sine(sampleRate,1000,2000),loudSpeech=sine(sampleRate,1000,16000);
+            EffectSettings leveling=new EffectSettings(true,false,0,0,0,0,0,0,true,0,0,250);
+            double dynamicRatio=rms(render(loudSpeech,leveling,sampleRate))/rms(render(quietSpeech,leveling,sampleRate));
+            check(dynamicRatio>2&&dynamicRatio<5,"Speech compression should reduce 8x amplitude ratio: "+dynamicRatio);
+            check(Arrays.equals(render(quietSpeech,EffectSettings.natural(),sampleRate),quietSpeech),"Neutral EQ unity");
+            short[] gritty=render(quietSpeech,new EffectSettings(true,false,0,0,0,0,0,0.5f,false,0,0,250),sampleRate);
+            check(!Arrays.equals(gritty,quietSpeech),"Grit changes voice");
+            for(EffectSettings preset:new EffectSettings[]{EffectSettings.lecture(),EffectSettings.vigilante()}) {
+                short[] effected=render(loudSpeech,preset,sampleRate);check(rms(effected)>100,"Preset audible");
+                for(short v:effected)check(Math.abs((int)v)<=29490,"Preset limiter");
+            }
+            EffectSettings allBypassed=new EffectSettings(false,true,-6,6,12,-12,12,1,true,1,0.5f,600);
+            check(Arrays.equals(render(quietSpeech,allBypassed,sampleRate),quietSpeech),"New effects respect bypass");
+            SignalProcessor cleared=new SignalProcessor(sampleRate);short[] block=new short[BLOCK],stereo=new short[BLOCK*2];Arrays.fill(block,(short)10000);
+            cleared.process(block,BLOCK,stereo,1,false,EffectSettings.lecture());cleared.process(block,BLOCK,stereo,1,true,EffectSettings.lecture());Arrays.fill(block,(short)0);
+            cleared.process(block,BLOCK,stereo,1,false,EffectSettings.lecture());for(short v:stereo)check(v==0,"Mute clears EQ state");
         }
         if(args.length>0) {
             File dir=new File(args[0]);dir.mkdirs();short[] sine=new short[RATE*3];for(int i=0;i<sine.length;i++)sine[i]=(short)(3000*Math.sin(2*Math.PI*220*i/RATE));
@@ -34,8 +62,10 @@ public class SignalProcessorTest {
             write(dir,"pitch-down",render(sine,new EffectSettings(true,false,-6,0,0,0,250),RATE));
             write(dir,"robot",render(sine,new EffectSettings(true,false,0,0,1,0,250),RATE));
         }
-        System.out.println("PASS: natural, gain, mute, limiter, echo timing/decay/tail clearing, bypass, bounds and overload at 44.1/48 kHz");
+        System.out.println("PASS: three-band EQ boost/cut, neutral EQ, speech leveling, grit, Lecture/Vigilante, new-effect bypass and mute state; natural, gain, mute, limiter, echo timing/decay/tail clearing, bypass, bounds and overload at 44.1/48 kHz");
     }
+    static short[] sine(int rate,double hz,int amplitude){short[] s=new short[rate*2];for(int i=0;i<s.length;i++)s[i]=(short)(amplitude*Math.sin(2*Math.PI*hz*i/rate));return s;}
+    static double rms(short[] s){double sum=0;int start=s.length/2;for(int i=start;i<s.length;i++)sum+=(double)s[i]*s[i];return Math.sqrt(sum/(s.length-start));}
     static short[] render(short[] signal,EffectSettings fx,int rate){
         SignalProcessor dsp=new SignalProcessor(rate);short[] result=new short[signal.length],in=new short[BLOCK],out=new short[BLOCK*2];
         for(int offset=0;offset<signal.length;offset+=BLOCK){int count=Math.min(BLOCK,signal.length-offset);System.arraycopy(signal,offset,in,0,count);dsp.process(in,count,out,1,false,fx);for(int i=0;i<count;i++)result[offset+i]=out[i*2];}return result;

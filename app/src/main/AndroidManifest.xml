@@ -4,7 +4,7 @@
     <uses-permission android:name="android.permission.BLUETOOTH_CONNECT" />
     <uses-feature android:name="android.hardware.microphone" android:required="true" />
     <uses-feature android:name="android.hardware.usb.host" android:required="false" />
-    <application android:label="MicBridge" android:icon="@drawable/ic_mic" android:theme="@style/AppTheme" android:allowBackup="false" android:supportsRtl="true">
+    <application android:label="MicBridge" android:icon="@mipmap/ic_launcher" android:roundIcon="@mipmap/ic_launcher" android:theme="@style/AppTheme" android:allowBackup="false" android:supportsRtl="true">
         <activity android:name=".MainActivity" android:exported="true" android:windowSoftInputMode="adjustResize">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
