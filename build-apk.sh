@@ -5,13 +5,14 @@ cd "$(dirname "$0")"
 : "${MICBRIDGE_PLATFORM:?Set MICBRIDGE_PLATFORM to the directory containing android.jar}"
 : "${MICBRIDGE_TOOLS:?Set MICBRIDGE_TOOLS to the Android build-tools directory}"
 TASK_BUILD="$PWD/build/manual"
+rm -rf "$TASK_BUILD/classes" "$TASK_BUILD/dex" "$TASK_BUILD/res" "$TASK_BUILD/generated" "$TASK_BUILD/classes.jar"
 mkdir -p "$TASK_BUILD/classes" "$TASK_BUILD/dex" "$TASK_BUILD/res"
 "$MICBRIDGE_TOOLS/aapt2" compile --dir app/src/main/res -o "$TASK_BUILD/res"
 mapfile -t TASK_RES < <(find "$TASK_BUILD/res" -name '*.flat' -print)
 sed 's/<manifest xmlns:/<manifest package="com.jerry.micbridge" xmlns:/' app/src/main/AndroidManifest.xml > "$TASK_BUILD/AndroidManifest.xml"
 "$MICBRIDGE_TOOLS/aapt2" link -o "$TASK_BUILD/base.apk" -I "$MICBRIDGE_PLATFORM/android.jar" \
     --manifest "$TASK_BUILD/AndroidManifest.xml" --java "$TASK_BUILD/generated" \
-    --min-sdk-version 26 --target-sdk-version 35 --version-code 1 --version-name 0.1.0 \
+    --min-sdk-version 26 --target-sdk-version 35 --version-code 2 --version-name 0.2.0 \
     "${TASK_RES[@]}"
 mapfile -t TASK_JAVA < <(find app/src/main/java "$TASK_BUILD/generated" -name '*.java' -print)
 if command -v javac >/dev/null; then
@@ -32,6 +33,6 @@ if [[ ! -f "$TASK_BUILD/test-signing.jks" ]]; then
 fi
 mkdir -p dist
 "$MICBRIDGE_TOOLS/apksigner" sign --ks "$TASK_BUILD/test-signing.jks" --ks-pass pass:android \
-    --key-pass pass:android --out dist/MicBridge-0.1.0-beta.apk "$TASK_BUILD/aligned.apk"
-"$MICBRIDGE_TOOLS/apksigner" verify --verbose dist/MicBridge-0.1.0-beta.apk
-echo 'Built dist/MicBridge-0.1.0-beta.apk'
+    --key-pass pass:android --out dist/MicBridge-0.2.0-beta.apk "$TASK_BUILD/aligned.apk"
+"$MICBRIDGE_TOOLS/apksigner" verify --verbose dist/MicBridge-0.2.0-beta.apk
+echo 'Built dist/MicBridge-0.2.0-beta.apk'

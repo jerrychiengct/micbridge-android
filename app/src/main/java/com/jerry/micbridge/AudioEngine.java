@@ -16,6 +16,7 @@ public final class AudioEngine {
     private volatile boolean running;
     private volatile boolean muted = true;
     private volatile float gain = 1f;
+    private volatile EffectSettings effects = EffectSettings.natural();
     private volatile String stopReason = "Stopped";
     private AudioRecord recorder;
     private AudioTrack player;
@@ -25,6 +26,8 @@ public final class AudioEngine {
     public boolean isRunning() { return running; }
     public void setMuted(boolean value) { muted = value; }
     public void setGain(float value) { gain = Math.max(0.1f, Math.min(3f, value)); }
+
+    public void setEffects(EffectSettings value) { effects = value; }
 
     public void start(AudioDeviceInfo input, AudioDeviceInfo output) {
         if (thread != null && thread.isAlive()) return;
@@ -87,7 +90,7 @@ public final class AudioEngine {
             }
             short[] capture = new short[rate / 100];
             short[] playback = new short[capture.length * 2];
-            SignalProcessor dsp = new SignalProcessor();
+            SignalProcessor dsp = new SignalProcessor(rate);
             boolean verified = false;
             long deadline = SystemClock.elapsedRealtime() + 3000;
             long lastMeter = 0;
@@ -106,8 +109,8 @@ public final class AudioEngine {
                     main.post(() -> { if (running) listener.onReady(route); });
                 }
                 if (!verified && SystemClock.elapsedRealtime() > deadline)
-                    throw new IllegalStateException("Phone did not route USB input to Bluetooth output. Check media output and retry.");
-                float peak = dsp.process(capture, count, playback, gain, muted || !verified);
+                    throw new IllegalStateException("Selected audio route unavailable. Check microphone and media output, then retry.");
+                float peak = dsp.process(capture, count, playback, gain, muted || !verified, effects);
                 int offset = 0;
                 while (running && offset < count * 2) {
                     int written = player.write(playback, offset, count * 2 - offset, AudioTrack.WRITE_BLOCKING);
@@ -143,6 +146,8 @@ public final class AudioEngine {
     }
 
     public static String deviceName(AudioDeviceInfo device) {
-        return device.getProductName().toString() + " (#" + device.getId() + ")";
+        String name = device.getProductName().toString().trim();
+        if(device.getType()==AudioDeviceInfo.TYPE_BUILTIN_MIC) return "Phone microphone";
+        return name.isEmpty() ? "Audio device" : name;
     }
 }
