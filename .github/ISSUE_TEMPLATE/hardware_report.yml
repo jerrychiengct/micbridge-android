@@ -1,0 +1,51 @@
+name: Hardware test report
+description: Document an actual microphone and speaker test.
+title: "[Hardware]: "
+body:
+  - type: input
+    id: version
+    attributes:
+      label: App version, phone and Android version
+    validations:
+      required: true
+  - type: textarea
+    id: hardware
+    attributes:
+      label: Microphone, adapter, speaker and connection types
+      description: Generic labels are fine. State the actual selected input and output.
+    validations:
+      required: true
+  - type: dropdown
+    id: result
+    attributes:
+      label: Overall result
+      options:
+        - Works in this setup
+        - Works with limitations
+        - Route unavailable
+        - Audio interrupted or unusable
+    validations:
+      required: true
+  - type: textarea
+    id: settings
+    attributes:
+      label: Settings and Live diagnostics
+      description: Include preset, gain, noise calibration, sample rate, mode, buffer and underruns.
+    validations:
+      required: true
+  - type: textarea
+    id: observations
+    attributes:
+      label: Delay, clarity, crackles, feedback and stability
+      description: Distinguish subjective delay from a measured result. If measured, describe the method. Do not equate app buffer size with total latency.
+    validations:
+      required: true
+  - type: textarea
+    id: stop_behaviour
+    attributes:
+      label: Disconnect, app-leave and focus-loss behaviour
+  - type: textarea
+    id: screenshots
+    attributes:
+      label: Optional app screenshots
+      description: Use actual device captures with private details and notifications removed.

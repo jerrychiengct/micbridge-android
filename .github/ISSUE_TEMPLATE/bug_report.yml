@@ -1,0 +1,44 @@
+name: Bug report
+description: Report an app, routing or audio-processing problem.
+title: "[Bug]: "
+body:
+  - type: markdown
+    attributes:
+      value: "Please omit personal recordings and sensitive information. Share the setup and reproducible behaviour."
+  - type: input
+    id: version
+    attributes:
+      label: MicBridge version
+      placeholder: 0.4.0 beta
+    validations:
+      required: true
+  - type: input
+    id: phone
+    attributes:
+      label: Phone model and Android version
+    validations:
+      required: true
+  - type: textarea
+    id: setup
+    attributes:
+      label: Microphone, adapter and speaker setup
+      description: Include selected input/output labels and connection types.
+    validations:
+      required: true
+  - type: textarea
+    id: reproduce
+    attributes:
+      label: Steps to reproduce
+    validations:
+      required: true
+  - type: textarea
+    id: outcome
+    attributes:
+      label: Expected and actual behaviour
+    validations:
+      required: true
+  - type: textarea
+    id: diagnostics
+    attributes:
+      label: Diagnostics or screenshots
+      description: Include the preset, gain, Fast/Balanced mode, app buffer and underruns where relevant. Remove identifying details from screenshots.

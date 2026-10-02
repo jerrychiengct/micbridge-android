@@ -1,0 +1,8 @@
+blank_issues_enabled: false
+contact_links:
+  - name: Support, donations and collaboration
+    url: https://github.com/jerrychiengct/micbridge-android/blob/main/SUPPORT.md
+    about: Contact the creator personally or read the project support details.
+  - name: Installation and troubleshooting
+    url: https://github.com/jerrychiengct/micbridge-android/blob/main/docs/INSTALLATION.md
+    about: Check setup and common audio issues before reporting a problem.

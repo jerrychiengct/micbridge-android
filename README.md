@@ -1,102 +1,96 @@
-# MicBridge 0.4.0 beta
+<p align="center">
+  <img src="docs/assets/micbridge-banner.png" alt="MicBridge — Live voice, clearly connected. Android 8+, 0.4.0 beta, on-device audio processing." width="100%" />
+</p>
 
-An Android live microphone app with a redesigned interface and an offline voice-effects engine. Designed for Android phones, including Poco X7 Pro, with a built-in or connected microphone and a selected audio output. The app routes audio by Android device capabilities; Xiaomi and other brands do not require separate drivers or a model whitelist.
+<p align="center">
+  <a href="dist/MicBridge-0.4.0-beta.apk"><strong>Download beta APK</strong></a> ·
+  <a href="docs/INSTALLATION.md">Get started</a> ·
+  <a href="VOICE_PRESETS.md">Voice presets</a> ·
+  <a href="CONTRIBUTING.md">Collaborate</a>
+</p>
 
-## Download
+# MicBridge
 
-[Download MicBridge 0.4.0 beta APK](dist/MicBridge-0.4.0-beta.apk). Open the file on GitHub and select **Download raw file**. This repository is private: sign in with an authorised account to download. [Previous 0.3.0 beta](dist/MicBridge-0.3.0-beta.apk) remains available.
+Turn an Android-compatible microphone into a live voice source for your selected speaker. Use the phone's built-in microphone or a connected USB / wired microphone, add speech clarity or creative effects, and send the result to a Bluetooth, wired or USB audio output.
 
-The new beta uses version code 4 and the same local signing certificate as 0.1.0, so it can update that installed build. Signing keystores are excluded from GitHub. It is an installable APK, not a Play Store release.
+Made for **lectures, presentations and voice experiments** by **Jerry Chieng Chin Tung**.
 
-## What changed
+## Download and start
 
-- Light interface with generous spacing, dark live-level monitor and teal controls.
-- **Live**, **Studio**, **Speakers** and **About** tabs; Start/Stop and Mute remain visible in every tab.
-- Real microphone-level history and input clipping indication. This is level history, not a sample waveform or a latency measurement.
-- 16 original presets: Natural, Clear voice, Deep voice, Bright voice, Robot, Room echo, Lecture, Vigilante, Studio Speech, Broadcast, Warm Narrator, Crisp Presenter, Soft Spoken, Small Room, Cyber Pilot and Cinematic.
-- Original studio-style tunings informed by standard EQ, compression and de-essing practices; no proprietary commercial plug-in or preset assets. See [VOICE_PRESETS.md](VOICE_PRESETS.md).
-- Effect bypass, approximate pitch shift from −6 to +6 semitones, warm/bright tone, robot modulation, echo blend and 100–600 ms echo timing.
-- Independent bass, mid and treble controls (−12 to +12 dB), alongside tone and pitch.
-- Adjustable grit / growl and optional speech dynamics leveling.
-- Software voice care: soft noise expansion, bounded quiet-voice assist up to +6 dB, selective de-essing, and 1.5-second muted noise-floor calibration.
-- Fast mode uses approximately 5 ms processing blocks, reduced capture buffering and a requested 10 ms output write buffer. Android may clamp that request. Buffer size grows if output underruns occur; Balanced mode uses 10 ms blocks and a 40 ms output-buffer request. Neither number is total acoustic latency.
-- Additional sample-rate negotiation and mono/stereo capture; stereo inputs are mixed to mono speech.
-- Generic Bluetooth-speaker instructions alongside the named-brand examples.
-- About credits Jerry Chieng Chin Tung, links to his public GitHub profile, and opens email for voluntary donation / collaboration enquiries at jerrychiengchintung@gmail.com. The repository retains its existing access controls.
-- Lecture preserves natural pitch, reduces rumble, cuts bass slightly and boosts speech presence with gentle compression.
-- Low-frequency rumble reduction, output limiter and microphone gain.
-- Modern Material-style adaptive microphone icon with Android 13 themed-icon support.
-- Settings retained locally; no microphone audio is stored.
-- Searchable speaker guide covering 12 brands, including Xiaomi Sound Pocket, Sound Outdoor and Xiaomi Bluetooth Speaker.
-- Any physical microphone input exposed by Android, including USB, wired and explicitly selectable built-in microphones. No brand-specific requirement.
-- Physical audio outputs exposed by Android: Bluetooth, wired, USB, phone speaker and other connected audio routes. Discovery is broader than the portable-speaker guide. Actual simultaneous input/output routing must pass verification.
-- Bluetooth hands-free / headset microphone combinations depend on Android communication routing; listing a device does not guarantee it can be used with a separate Bluetooth media speaker. Unsupported combinations stay muted and stop with a routing error.
+**[Download MicBridge 0.4.0 beta](dist/MicBridge-0.4.0-beta.apk)** · Android 8.0 or newer · 2 October 2026
 
-## First test
+Open the APK link, then choose **Download raw file** on GitHub. This repository is private: you need access and a signed-in GitHub account. This is an installable beta APK; there is no Play Store listing.
 
-1. Install the APK on the Poco. Allow **Microphone** and **Nearby devices** permissions.
-2. Connect a USB / wired microphone if desired, or choose **Phone microphone** in the app.
-3. Pair your Bluetooth speaker in Android Bluetooth settings; enable media audio. Confirm normal music plays through it, then stop the music.
-4. Open **Live**, tap **Refresh connected devices**, and select your microphone and output. USB audio names may be generic.
-5. Turn speaker volume low and keep it away from the microphone. Leave gain at 1.0× and select **Lecture** in Voice Studio for speeches, or **Natural** for an unprocessed voice.
-6. Tap **Start session**. The app sends silence while verifying the actual microphone and output routes.
-7. When it reports **Ready · muted**, check the input meter. Tap **Calibrate background noise**, stay quiet for 1.5 seconds, then tap **Unmute**. Recalibrate after changing mic or room. Loud background or speaking during calibration requires a retry.
-8. Try a preset. Start with subtle effects. Check delay, distortion and stability for at least one minute.
-9. Tap **Mute now** or **Stop session** when finished. Phone volume buttons control media volume.
+1. Install the APK and allow **Microphone** and **Nearby devices** permissions when requested.
+2. Connect your microphone, or use **Phone microphone**. Pair your speaker in Android settings and enable **Media audio**.
+3. On **Live**, select the input and output. Start with low speaker volume and gain around **1.0×**.
+4. Choose **Lecture** in **Studio**, then tap **Start session**. The app checks the actual route while muted.
+5. Tap **Calibrate background noise**, stay quiet for 1.5 seconds, then **Unmute**.
 
-The app must remain visible. It keeps the display awake during a session and stops when it leaves the screen, the phone locks, a selected device disconnects, an actual route changes, or another app/call takes audio focus. Switching between the four in-app tabs does not stop audio. Opening settings or a manufacturer link does.
+Keep MicBridge visible during playback. [Full installation guide and troubleshooting →](docs/INSTALLATION.md)
 
-## Lecture use
+## What you can do
 
-Use **Lecture**, a separate speaker, low initial physical volume and gain around 1.0×. Leave pitch, echo and grit off for intelligibility. Raise mid gently if speech sounds muffled, reduce bass if it sounds boomy, and reduce treble if it sounds harsh. Keep the microphone away from the speaker. Phone-speaker output is available with a feedback reminder before Unmute. Bluetooth delay can be distracting when speaking; a wired or USB output usually offers a better route for live amplification. This beta must remain visible and cannot replace a validated PA system for an important lecture.
+| Feature | What it gives you |
+| --- | --- |
+| Flexible microphone input | Built-in, Android-compatible USB and wired microphones; mono/stereo format negotiation |
+| Choose your output | Generic Bluetooth speakers, named brands, wired / USB audio and the phone speaker |
+| Speech voice care | Gentle noise reduction, microphone noise-floor calibration, bounded level assist and de-essing |
+| Shape your sound | Independent bass, mid and treble, warm/bright tone, pitch, grit, robot texture and echo |
+| 16 original presets | Lecture, Studio Speech, Broadcast, Warm Narrator, Vigilante and more |
+| Latency controls | Approximately 5 ms processing blocks in Fast mode, smaller requested buffers and underrun recovery |
+| Live monitoring | Input-level history, clipping indication, actual-route checks, persistent Mute and Stop controls |
+| Local processing | No microphone recordings, cloud processing, advertising or analytics |
 
-## Speaker compatibility
+## Inside the app
 
-The guide is informational, not an exhaustive list of every portable speaker or a list of physically tested devices. The discovery list is not restricted to the guide's brands. Any connected output exposed through a supported Android audio route is eligible.
+| Tab | Purpose |
+| --- | --- |
+| **Live** | Select microphone and speaker, monitor input, calibrate noise and manage playback |
+| **Studio** | Pick a preset, adjust EQ and effects, or bypass processing |
+| **Speakers** | Read generic Bluetooth instructions and browse examples from 12 brands |
+| **About** | Find creator details, GitHub links and donation / collaboration email buttons |
 
-Classic Bluetooth media playback uses A2DP. LE Audio playback is supported when Android exposes a BLE speaker/headset audio route. A Bluetooth Low Energy connection used only for app control is not an audio route. Wi-Fi-only speakers and proprietary wireless systems require a suitable audio receiver or another supported connection. Stereo/party linking is handled by the speaker manufacturer, not by MicBridge.
+The Material-style adaptive icon supports Android themed icons. The banner above is a branding graphic, not a device screenshot. Genuine interface screenshots will be added after capture on a phone or emulator; the screenshot instructions are in [Testing](docs/TESTING.md#capture-interface-screenshots).
 
-Manufacturer examples and research links are in [SPEAKER_GUIDE.md](SPEAKER_GUIDE.md). Named models researched on 1 October 2026; generic instructions added on 2 October 2026. Availability in Malaysia varies; this app is not a retailer and does not show prices or stock.
+## Start with the right preset
 
-## Sound modulator
+- **Lecture / Studio Speech:** natural pitch, speech presence, gentle leveling and voice care.
+- **Broadcast / Warm Narrator:** warmer spoken delivery.
+- **Crisp Presenter / Soft Spoken:** clearer consonants or bounded assistance for a quiet voice.
+- **Vigilante / Cyber Pilot / Cinematic:** creative character textures.
+- **Natural:** neutral processing; use **Effects bypass** to turn processing off.
 
-Audio is processed locally. The app first tries rates shared by input and output, then advertised input rates and common Android conversion fallbacks (48, 44.1, 32, 24, 16, 96, 22.05 and 8 kHz). Supported rates are limited to 8–192 kHz. Mono and stereo capture configurations are attempted:
+All presets are original MicBridge tunings. Commercial preset packs, licensed voice models and paid plug-in engines are not included. [Full preset collection and processing references →](VOICE_PRESETS.md)
 
-`Selected microphone → rumble filter / tone / 3-band EQ → voice care → pitch → grit → speech compressor → robot modulation → echo → gain / limiter → selected output`
+## Compatibility and latency
 
-Natural mode bypasses creative stages with neutral settings. Effects can also be bypassed with the switch. Pitch uses two interpolated, crossfaded delay taps with a 40 ms window. It is an approximate creative effect and can produce grain or warble; it is not a professional formant-preserving pitch processor. Robot texture uses 70 Hz ring modulation. Echo uses a feedback delay with selectable spacing and blend. Tone is a crossover-based warm/bright tilt. Separate EQ bands use a 180 Hz low shelf, a 1.5 kHz peaking mid filter (Q 0.8), and a 4 kHz high shelf. Live EQ changes ease across blocks. Grit blends a soft tanh saturation stage with the original signal. Speech leveling uses a −18 dBFS envelope threshold, roughly 2.5:1 compression, 10 ms attack and 180 ms release, without automatic makeup gain. Vigilante combines −5 semitones, a warmer tone, bass boost and 35% grit; it is an approximation, not an exact actor or character imitation. The final block limiter bounds digital output to roughly 90% full scale. Mute clears delayed effect tails and filter / voice-care state inside the app.
+Microphone support depends on what Android and your adapter expose as a working audio input. Speaker support follows the audio connection, with no brand whitelist. Generic names such as **BT Speaker** or **Wireless Speaker** are welcome. [Speaker guide →](SPEAKER_GUIDE.md)
 
-Voice care uses a calibrated or conservative default noise floor for a soft downward expander. This reduces quiet background between phrases, not noise mixed into speech. Level assist avoids floor-only input and bounds gain to 0.5–2.0×. De-essing reduces the upper band when its envelope dominates; it is best-effort software processing, not AI restoration. It adds no intentional look-ahead buffer. These controls are optional, and Natural or Effects bypass preserves neutral processing. Heavy hiss, clipping, poor mic placement or a defective adapter cannot be fixed regardless of hardware quality.
+Fast mode requests smaller app buffers; Android can adjust their size. **5 ms is a processing-block duration, not measured microphone-to-speaker latency.** Bluetooth speakers add their own buffering. Wired or USB output is usually the better choice when delay is distracting. Pitch effects add processing delay, and echo adds audible repeats.
 
-Bluetooth buffering cannot be removed by this app. Pitch processing and echo alter timing further. Mute/Stop prevent new audio from being submitted, but already buffered Bluetooth audio may continue briefly. If acoustic feedback occurs, lower the speaker's physical volume or power it off. The limiter cannot prevent feedback or repair clipping at the microphone transmitter.
+Processing can improve levels and clarity, but cannot restore missing detail, repair transmitter clipping or prevent acoustic feedback. Keep the microphone away from the speaker. Bluetooth headset microphones may not work independently with a separate Bluetooth media speaker; unsupported routes remain muted and stop with an error.
 
-## Build
+## Beta status
 
-Android 8.0+ (API 26); compile/target SDK 35; JDK 17; Android Gradle Plugin 8.7.3 and Gradle 8.9. No third-party app runtime dependencies.
+| Check | Current status |
+| --- | --- |
+| Android SDK 35 compilation / APK signature | Verified for 0.4.0 |
+| Digital audio and format-negotiation tests | Passed; scope documented in [Testing](docs/TESTING.md) |
+| Upgrade signing | Same test certificate as earlier supplied betas |
+| Physical microphone / speaker combinations | Awaiting documented hardware test results |
+| End-to-end acoustic latency | Not yet measured on a physical setup |
+| Foreground operation | App must remain visible; leaving the screen stops the session |
 
-Open the project in Android Studio, use an installed Gradle 8.9 distribution, and build `:app:assembleDebug`. No Gradle wrapper is included. Android Studio's debug certificate differs from the supplied APK's local test certificate, so independently signed APKs may require uninstalling the previous build.
+[Changelog](CHANGELOG.md) · [Build instructions](docs/BUILDING.md) · [Audio engine](docs/AUDIO_ENGINE.md)
 
-Alternatively run the included SDK-only script:
+## Support and collaboration
 
-```bash
-MICBRIDGE_PLATFORM="$ANDROID_HOME/platforms/android-35" \
-MICBRIDGE_TOOLS="$ANDROID_HOME/build-tools/35.0.0" \
-./build-apk.sh
-```
+Created by **[Jerry Chieng Chin Tung](https://github.com/jerrychiengct)**. Android developers, audio engineers, designers and beta testers are welcome.
 
-The script writes `dist/MicBridge-0.4.0-beta.apk`. Keep the locally generated signing key separately for consistent updates. If no JDK compiler is available, `MICBRIDGE_ECJ` may point to an Eclipse ECJ compiler JAR. Keystores, local SDK paths and build directories are ignored by git.
+- **Collaborate:** read [Contributing](CONTRIBUTING.md), then share an idea, improvement or hardware test report.
+- **Report a problem:** use the repository's [issue forms](https://github.com/jerrychiengct/micbridge-android/issues/new/choose) if you have access.
+- **Donate or contact Jerry:** email **[jerrychiengchintung@gmail.com](mailto:jerrychiengchintung@gmail.com?subject=MicBridge%20project%20support)** personally. Donations are voluntary; MicBridge does not collect payments.
+- **Follow other projects:** visit [Jerry's public GitHub profile](https://github.com/jerrychiengct). Repository access is still required for private project links.
 
-## Validation and limits
-
-- Compiled against Android SDK 35; DEX conversion and APK signature checks completed.
-- Digital tests cover unity gain, gain scaling, limiter ceiling, stereo equality, mute, echo timing, decay, clearing muted tails, effect bypass and buffer bounds.
-- EQ boost/cut, neutral response, speech compression, grit, preset audibility, bypass and cleared filter state tested at 44.1 and 48 kHz.
-- New voice-care tests cover soft noise expansion, calibrated noise floor, bounded level assist, no floor-only boost, selective de-essing, every preset at 8/16/32/44.1/48/96 kHz, 5/10 ms block paths, bypass and cleared mute state.
-- Format negotiation, stereo downmix without overflow, and output-buffer recovery capacity tested. Buffer decisions and actual latency still require hardware validation.
-- Overload tests exercise every effect. Spectral tests check pitch direction and robot modulation sidebands.
-- Same signing certificate as v0.1.0, verified for upgrade consistency.
-- No real-device or emulator UI validation was available. Microphone / speaker combinations and end-to-end delay require physical testing on the phone. The manufacturer's Bluetooth specification is not proof of this exact live input/output combination.
-
-No internet permission, advertising, analytics, cloud processing or audio recording files. Opening an optional source link uses the phone's external browser.
-
-Created for Jerry Chieng Chin Tung. Beta 0.4.0, 2 October 2026.
+[Support details](SUPPORT.md) · [Privacy](PRIVACY.md)
