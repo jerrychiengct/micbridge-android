@@ -22,17 +22,16 @@ public final class MainActivity extends Activity implements AudioEngine.Listener
     private final Handler handler=new Handler(Looper.getMainLooper());
     private final List<AudioDeviceInfo> inputs=new ArrayList<>(),outputs=new ArrayList<>();
     private Spinner input,output;
-    private Button start,mute,refresh; private final Button[] tabs=new Button[3], presets=new Button[8];
-    private TextView status,route,level,connectionCount,presetName,fxSummary;
+    private Button start,mute,refresh,calibrate; private final Button[] tabs=new Button[4], presets=new Button[VoicePresets.TITLES.length];
+    private TextView status,route,level,connectionCount,presetName,fxSummary,audioHealth,calibrationStatus;
     private MeterView meter;
-    private final LinearLayout[] pages=new LinearLayout[3]; private LinearLayout catalogCards;
-    private ScrollView scroll; private Switch bypass,clarity,speech;
-    private Slider gain,pitch,tone,bass,mid,treble,growl,robot,echo,delay;
-    private boolean active,ready,isMuted=true,destroyed,changing;
-    private int liveInputId=-1,liveOutputId=-1,presetIndex=0;
+    private final LinearLayout[] pages=new LinearLayout[4]; private LinearLayout catalogCards;
+    private ScrollView scroll; private Switch bypass,clarity,speech,autoLevel,fast;
+    private Slider gain,pitch,tone,bass,mid,treble,growl,robot,echo,delay,noise,deEss;
+    private boolean active,ready,calibrating,isMuted=true,destroyed,changing;
+    private int liveInputId=-1,liveOutputId=-1,presetIndex=6;
     private AudioFocusRequest focus;
-    private final String[] presetTitles={"Natural","Clear voice","Deep voice","Bright voice","Robot","Room echo","Lecture","Vigilante"};
-    private final String[] presetHints={"Original voice","Speech clarity","Lower pitch","Higher pitch","Metallic texture","Spacious repeats","Clear, steady speech","Deep, gritty hero"};
+    private final String[] presetTitles=VoicePresets.TITLES,presetHints=VoicePresets.HINTS;
     private final AudioDeviceCallback devices=new AudioDeviceCallback() {
         @Override public void onAudioDevicesAdded(AudioDeviceInfo[] added) { if(!active) refreshDevices(); }
         @Override public void onAudioDevicesRemoved(AudioDeviceInfo[] removed) {
@@ -72,14 +71,14 @@ public final class MainActivity extends Activity implements AudioEngine.Listener
             else { top=insets.getSystemWindowInsetTop();bottom=insets.getSystemWindowInsetBottom(); }
             root.setPadding(0,top,0,bottom);return insets;
         });
-        LinearLayout header=new LinearLayout(this);header.setGravity(Gravity.CENTER_VERTICAL);header.setPadding(dp(22),dp(10),dp(22),dp(10));
-        ImageView logo=new ImageView(this);logo.setImageResource(R.mipmap.ic_launcher);logo.setContentDescription("MicBridge logo");LinearLayout.LayoutParams logoSize=new LinearLayout.LayoutParams(dp(44),dp(44));logoSize.rightMargin=dp(12);header.addView(logo,logoSize);
-        LinearLayout brand=vertical();brand.addView(heading("MicBridge",27));brand.addView(text("VOICE TO SPEAKER",10,SUB));header.addView(brand,new LinearLayout.LayoutParams(0,-2,1));
-        TextView beta=text("BETA 0.3",11,TEAL);beta.setTypeface(Typeface.DEFAULT,Typeface.BOLD);beta.setPadding(dp(12),dp(8),dp(12),dp(8));beta.setBackground(shape(PALE,30));header.addView(beta);root.addView(header);
+        LinearLayout header=new LinearLayout(this);header.setGravity(Gravity.CENTER_VERTICAL);header.setPadding(dp(16),dp(10),dp(16),dp(10));
+        ImageView logo=new ImageView(this);logo.setImageResource(R.mipmap.ic_launcher);logo.setContentDescription("MicBridge logo");LinearLayout.LayoutParams logoSize=new LinearLayout.LayoutParams(dp(36),dp(36));logoSize.rightMargin=dp(12);header.addView(logo,logoSize);
+        LinearLayout brand=vertical();brand.addView(heading("MicBridge",24));brand.addView(text("VOICE TO SPEAKER",10,SUB));header.addView(brand,new LinearLayout.LayoutParams(0,-2,1));
+        TextView beta=text("BETA 0.4",11,TEAL);beta.setTypeface(Typeface.DEFAULT,Typeface.BOLD);beta.setPadding(dp(12),dp(8),dp(12),dp(8));beta.setBackground(shape(PALE,30));header.addView(beta);root.addView(header);
         scroll=new ScrollView(this);scroll.setFillViewport(true);scroll.setClipToPadding(false);scroll.setPadding(dp(18),dp(8),dp(18),dp(8));
         LinearLayout content=vertical();scroll.addView(content);root.addView(scroll,new LinearLayout.LayoutParams(-1,0,1));
-        for(int i=0;i<3;i++) { pages[i]=vertical();content.addView(pages[i]); }
-        buildLive(pages[0]);buildStudio(pages[1]);buildSpeakers(pages[2]);
+        for(int i=0;i<4;i++) { pages[i]=vertical();content.addView(pages[i]); }
+        buildLive(pages[0]);buildStudio(pages[1]);buildSpeakers(pages[2]);buildAbout(pages[3]);
         LinearLayout dock=vertical();dock.setBackgroundColor(PAPER);dock.setPadding(dp(20),dp(8),dp(20),0);
         status=text("Connect a microphone and speaker",13,SUB);status.setMaxLines(3);dock.addView(status);
         LinearLayout actions=new LinearLayout(this);start=button("Start session",TEAL);mute=button("Unmute",PALE);enabled(mute,false);
@@ -88,8 +87,8 @@ public final class MainActivity extends Activity implements AudioEngine.Listener
         start.setOnClickListener(v->{if(active)stopAudio("Session stopped");else startAudio();});
         mute.setOnClickListener(v->toggleMute());
         LinearLayout nav=new LinearLayout(this);
-        String[] labels={"Live","Voice studio","Speakers"};
-        for(int i=0;i<3;i++) { final int n=i;tabs[i]=button(labels[i],PAPER);nav.addView(tabs[i],new LinearLayout.LayoutParams(0,dp(54),1));tabs[i].setOnClickListener(v->showPage(n)); }
+        String[] labels={"Live","Studio","Speakers","About"};
+        for(int i=0;i<4;i++) { final int n=i;tabs[i]=button(labels[i],PAPER);tabs[i].setTextSize(12);nav.addView(tabs[i],new LinearLayout.LayoutParams(0,dp(54),1));tabs[i].setOnClickListener(v->showPage(n)); }
         dock.addView(nav);root.addView(dock);showPage(0);
     }
     private void buildLive(LinearLayout page) {
@@ -104,9 +103,18 @@ public final class MainActivity extends Activity implements AudioEngine.Listener
         connections.addView(text("SPEAKER OUTPUT",11,TEAL));output=new Spinner(this);connections.addView(output,new LinearLayout.LayoutParams(-1,dp(52)));
         connections.addView(text("Device names come from Android. Bluetooth headset microphones may require a paired hands-free output; combinations that Android cannot route will stay muted.",12,SUB));
         refresh=button("Refresh connected devices",PALE);fullButton(connections,refresh);refresh.setOnClickListener(v->ensurePermissions());
-        Button pair=button("Pair a Bluetooth speaker",BG);fullButton(connections,pair);pair.setOnClickListener(v->startActivity(new Intent(Settings.ACTION_BLUETOOTH_SETTINGS)));
+        Button pair=button("Pair a Bluetooth speaker",BG);fullButton(connections,pair);pair.setOnClickListener(v->openExternal(new Intent(Settings.ACTION_BLUETOOTH_SETTINGS)));
+        fast=new Switch(this);fast.setText("Prefer shorter latency buffers");fast.setTextColor(INK);fast.setTextSize(14);fast.setChecked(true);connections.addView(fast);
+        fast.setOnCheckedChangeListener((b,on)->engine.setPreferFast(on));
+        connections.addView(text("Fast uses 5 ms processing blocks and requests a smaller output buffer. If audio crackles, stop and switch this off for 10 ms blocks. Bluetooth delay remains device-dependent.",12,SUB));
+        audioHealth=text("Buffer diagnostics appear during a session.",12,SUB);connections.addView(audioHealth);
         gain=new Slider(connections,"Microphone gain",290,90,p->String.format(Locale.UK,"%.1f×",0.1f+p/100f));
         gain.setOnChange(()->{engine.setGain(0.1f+gain.value()/100f);});
+        LinearLayout quality=card(page);quality.addView(heading("Voice care for any mic",19));
+        quality.addView(text("Use an Android-compatible USB / wired microphone or Phone microphone. Lecture adds gentle noise reduction, de-essing and bounded level assist. Processing improves clarity but cannot repair a distorted transmitter or restore missing detail.",13,SUB));
+        calibrate=button("Calibrate background noise",PALE);fullButton(quality,calibrate);enabled(calibrate,false);
+        calibrationStatus=text("Start a session, stay muted, then remain quiet for 1.5 seconds during calibration. Recalibrate after changing mic or room.",12,SUB);quality.addView(calibrationStatus);
+        calibrate.setOnClickListener(v->{if(ready&&!calibrating){calibrating=true;isMuted=true;engine.setMuted(true);engine.calibrate();enabled(mute,false);enabled(calibrate,false);calibrationStatus.setText("Calibrating… please stay quiet for 1.5 seconds.");updateLiveState();}});
         LinearLayout guide=card(page);guide.addView(heading("A good first test",18));
         guide.addView(text("Choose the phone microphone or a connected USB / wired mic, then select your speaker. For speeches and lectures, choose Lecture in Voice studio. Begin at low volume and keep the speaker away from the microphone.",14,SUB));
         Button lectureButton=button("Use Lecture preset",PALE);fullButton(guide,lectureButton);lectureButton.setOnClickListener(v->{applyPreset(6);showPage(1);});
@@ -115,7 +123,8 @@ public final class MainActivity extends Activity implements AudioEngine.Listener
     private void buildStudio(LinearLayout page) {
         page.addView(heading("Shape your voice",27));page.addView(text("Choose a preset, then make it yours.",14,SUB));
         LinearLayout choices=card(page);presetName=heading("Natural",20);choices.addView(presetName);
-        for(int row=0;row<4;row++) { LinearLayout line=new LinearLayout(this);
+        for(int row=0;row<presetTitles.length/2;row++) { LinearLayout line=new LinearLayout(this);
+            if(row==4){choices.addView(heading("Studio collection",18));choices.addView(text("Original tunings inspired by professional voice chains. No paid plug-ins required.",12,SUB));}
             for(int col=0;col<2;col++) { final int index=row*2+col;Button p=button(presetTitles[index]+"\n"+presetHints[index],BG);p.setTextSize(12);presets[index]=p;
                 LinearLayout.LayoutParams lp=new LinearLayout.LayoutParams(0,dp(68),1);lp.setMargins(col==0?0:dp(5),dp(8),col==0?dp(5):0,0);line.addView(p,lp);p.setOnClickListener(v->applyPreset(index)); }
             choices.addView(line);
@@ -135,18 +144,24 @@ public final class MainActivity extends Activity implements AudioEngine.Listener
         delay=new Slider(controls,"Echo timing",500,150,p->(p+100)+" ms");
         clarity=new Switch(this);clarity.setText("Reduce low-frequency rumble");clarity.setTextColor(INK);clarity.setTextSize(14);controls.addView(clarity);
         speech=new Switch(this);speech.setText("Level speech dynamics");speech.setTextColor(INK);speech.setTextSize(14);controls.addView(speech);
+        controls.addView(heading("Voice care",18));
+        autoLevel=new Switch(this);autoLevel.setText("Assist quiet voices · up to +6 dB");autoLevel.setTextColor(INK);autoLevel.setTextSize(14);controls.addView(autoLevel);
+        noise=new Slider(controls,"Soft noise reduction",100,0,p->p+"%");
+        deEss=new Slider(controls,"Tame sharp S sounds",100,0,p->p+"%");
         Runnable change=()->{if(!changing){presetIndex=-1;updateEffects();}};
-        pitch.setOnChange(change);tone.setOnChange(change);bass.setOnChange(change);mid.setOnChange(change);treble.setOnChange(change);growl.setOnChange(change);robot.setOnChange(change);echo.setOnChange(change);delay.setOnChange(change);
+        noise.setOnChange(change);deEss.setOnChange(change);autoLevel.setOnCheckedChangeListener((b,on)->change.run());pitch.setOnChange(change);tone.setOnChange(change);bass.setOnChange(change);mid.setOnChange(change);treble.setOnChange(change);growl.setOnChange(change);robot.setOnChange(change);echo.setOnChange(change);delay.setOnChange(change);
         bypass.setOnCheckedChangeListener((b,on)->{if(!changing)updateEffects();});clarity.setOnCheckedChangeListener((b,on)->change.run());speech.setOnCheckedChangeListener((b,on)->change.run());
         fxSummary=text("Natural voice • effects add no intentional delay",12,SUB);controls.addView(fxSummary);
         Button reset=button("Reset to natural voice",PALE);fullButton(controls,reset);reset.setOnClickListener(v->applyPreset(0));
         page.addView(text("Lecture keeps your natural pitch, removes rumble and gently levels louder speech. Vigilante is a Batman-inspired creative effect, not an exact character or actor voice. Pitch is an approximate beta effect. The limiter reduces digital clipping; it cannot prevent feedback.",12,SUB));
     }
     private void buildSpeakers(LinearLayout page) {
-        page.addView(heading("Find your speaker",27));page.addView(text("12 brands. One Bluetooth audio connection.",14,SUB));
+        page.addView(heading("Find your speaker",27));page.addView(text("Generic speakers and 12 named brands.",14,SUB));
         LinearLayout intro=card(page);intro.addView(heading("Xiaomi, Tribit and beyond",19));
         intro.addView(text("Pair in Android settings, enable media audio, then choose the connected speaker on Live. MicBridge works by connection type, not by brand.",14,SUB));
         intro.addView(text("This guide lists examples from manufacturer pages. It is not an exhaustive market list or a list of device-tested models. Malaysian stock and availability vary.",12,SUB));
+        LinearLayout generic=card(page);generic.addView(heading("Generic Bluetooth speaker",19));generic.addView(text("No brand name needed. Pair in Android Bluetooth settings, enable Media audio, then select the speaker on Live. Labels such as BT Speaker, Wireless Speaker or a model code are normal. Listing it here does not add a driver; Android must expose a working audio output.",13,SUB));
+        Button genericHelp=button("Open Bluetooth settings",PALE);fullButton(generic,genericHelp);genericHelp.setOnClickListener(v->openExternal(new Intent(Settings.ACTION_BLUETOOTH_SETTINGS)));
         EditText search=new EditText(this);search.setSingleLine(true);search.setTextSize(15);search.setTextColor(INK);search.setHintTextColor(SUB);search.setHint("Search brand or model");search.setPadding(dp(16),dp(10),dp(16),dp(10));search.setBackground(shape(PAPER,14));page.addView(search,new LinearLayout.LayoutParams(-1,dp(52)));
         catalogCards=vertical();LinearLayout.LayoutParams lp=new LinearLayout.LayoutParams(-1,-2);lp.topMargin=dp(14);page.addView(catalogCards,lp);renderCatalog("");
         search.addTextChangedListener(new TextWatcher(){public void beforeTextChanged(CharSequence s,int a,int c,int f){}public void onTextChanged(CharSequence s,int a,int b,int c){renderCatalog(s.toString());}public void afterTextChanged(Editable e){}});
@@ -160,11 +175,26 @@ public final class MainActivity extends Activity implements AudioEngine.Listener
             Button help=button("Connection guide",BG);fullButton(c,help);
             help.setOnClickListener(v->new AlertDialog.Builder(this).setTitle(item[0]+" connection")
                 .setMessage("1. Put the speaker into Bluetooth pairing mode.\n2. Pair it in Android settings and enable media audio.\n3. Return to MicBridge, refresh and select it on Live.\n\nFor devices showing both normal and LE names, use the normal media-audio entry. Bluetooth Low Energy control alone is not LE Audio playback.\n\nOpening a manufacturer page leaves this app and stops any live session.")
-                .setPositiveButton("Manufacturer page",(d,w)->startActivity(new Intent(Intent.ACTION_VIEW,Uri.parse(item[2])))).setNegativeButton("Close",null).show());
+                .setPositiveButton("Manufacturer page",(d,w)->openExternal(new Intent(Intent.ACTION_VIEW,Uri.parse(item[2])))).setNegativeButton("Close",null).show());
         }
         if(found==0)catalogCards.addView(text("No examples found. You can still connect an unlisted Bluetooth media speaker.",14,SUB));
     }
-    private void showPage(int index) {for(int i=0;i<3;i++){pages[i].setVisibility(i==index?View.VISIBLE:View.GONE);tabs[i].setBackground(shape(i==index?PALE:PAPER,14));tabs[i].setTextColor(i==index?TEAL:SUB);}scroll.scrollTo(0,0);}
+    private void buildAbout(LinearLayout page){
+        page.addView(heading("A voice worth sharing",26));page.addView(text("MicBridge 0.4.0 beta · Android 8+",13,SUB));
+        LinearLayout creator=card(page);creator.addView(heading("Created by",16));creator.addView(heading(AppInfo.CREATOR,22));creator.addView(text("An independent project to make live speech amplification and creative voice tools more accessible. Built for lectures, presentations and everyday voice experiments.",14,SUB));
+        LinearLayout support=card(page);support.addView(heading("Support the project",20));support.addView(text("Visit my GitHub to follow my work and support development. If you would like to donate, please email me personally to discuss the details. Donations are voluntary.",14,SUB));
+        Button github=button("Visit my GitHub",TEAL);fullButton(support,github);github.setOnClickListener(v->openExternal(new Intent(Intent.ACTION_VIEW,Uri.parse(AppInfo.GITHUB))));
+        Button project=button("Project repository",PALE);fullButton(support,project);project.setOnClickListener(v->openExternal(new Intent(Intent.ACTION_VIEW,Uri.parse(AppInfo.REPOSITORY))));support.addView(text("The project repository may require access and a GitHub sign-in.",12,SUB));
+        support.addView(text(AppInfo.EMAIL,14,TEAL));Button donate=button("Email about a donation",PALE);fullButton(support,donate);donate.setOnClickListener(v->emailCreator("MicBridge — project support"));
+        LinearLayout collaborate=card(page);collaborate.addView(heading("Open for collaboration",20));collaborate.addView(text("Android developers, audio engineers, designers and beta testers are welcome. Share your ideas, hardware test results or a proposal by email.",14,SUB));Button contact=button("Discuss a collaboration",TEAL);fullButton(collaborate,contact);contact.setOnClickListener(v->emailCreator("MicBridge — collaboration enquiry"));
+        LinearLayout privacy=card(page);privacy.addView(heading("Privacy and practical limits",18));privacy.addView(text("Processing stays on your phone. No recordings, cloud upload, advertising or analytics. The app remains on screen during a session and stops when you leave it. External links and email open another app and stop live audio. No donation is collected inside MicBridge.",13,SUB));privacy.addView(text("USB and wired mic compatibility depends on Android and the adapter. Bluetooth adds buffering. Voice care is best-effort processing, not studio restoration, feedback cancellation or a guarantee of identical sound across microphones.",12,SUB));
+    }
+    private void openExternal(Intent intent){try{startActivity(intent);}catch(ActivityNotFoundException error){Toast.makeText(this,"No app available to open this link",Toast.LENGTH_LONG).show();}}
+    private void emailCreator(String subject){
+        try{startActivity(new Intent(Intent.ACTION_SENDTO,Uri.parse("mailto:"+AppInfo.EMAIL+"?subject="+Uri.encode(subject))));}
+        catch(ActivityNotFoundException error){android.content.ClipboardManager clipboard=(android.content.ClipboardManager)getSystemService(CLIPBOARD_SERVICE);clipboard.setPrimaryClip(ClipData.newPlainText("MicBridge creator email",AppInfo.EMAIL));Toast.makeText(this,"Email address copied: "+AppInfo.EMAIL,Toast.LENGTH_LONG).show();}
+    }
+    private void showPage(int index) {for(int i=0;i<4;i++){pages[i].setVisibility(i==index?View.VISIBLE:View.GONE);tabs[i].setBackground(shape(i==index?PALE:PAPER,14));tabs[i].setTextColor(i==index?TEAL:SUB);}scroll.scrollTo(0,0);}
     private final class Slider {
         final SeekBar bar;final TextView label;final String title;final Formatter formatter;Runnable callback;
         Slider(LinearLayout parent,String title,int max,int value,Formatter f) {
@@ -177,25 +207,25 @@ public final class MainActivity extends Activity implements AudioEngine.Listener
     }
     private interface Formatter {String format(int p);}
     private void applyPreset(int index) {
-        changing=true;presetIndex=index;bypass.setChecked(true);clarity.setChecked(index==1||index==6||index==7);speech.setChecked(index==6);
-        pitch.value(index==2?2:index==3?10:index==7?1:6);tone.value(index==1?8:index==2?4:index==3?8:index==7?5:6);
-        bass.value(index==6?10:index==7?16:12);mid.value(index==6?15:index==7?11:12);treble.value(index==6?13:index==7?10:12);
-        growl.value(index==7?35:0);robot.value(index==4?85:0);echo.value(index==5?30:0);delay.value(150);changing=false;updateEffects();
+        EffectSettings fx=VoicePresets.get(index);changing=true;presetIndex=index;bypass.setChecked(true);clarity.setChecked(fx.clarity);speech.setChecked(fx.speech);autoLevel.setChecked(fx.autoLevel);
+        pitch.value(Math.round(fx.pitch)+6);tone.value(Math.round(fx.tone)+6);bass.value(Math.round(fx.bass)+12);mid.value(Math.round(fx.mid)+12);treble.value(Math.round(fx.treble)+12);
+        growl.value(Math.round(fx.growl*100));robot.value(Math.round(fx.robot*100));echo.value(Math.round(fx.echo*100));delay.value(fx.echoMillis-100);noise.value(Math.round(fx.noise*100));deEss.value(Math.round(fx.deEss*100));changing=false;updateEffects();
     }
     private void updateEffects() {
-        engine.setEffects(new EffectSettings(bypass.isChecked(),clarity.isChecked(),pitch.value()-6,tone.value()-6,bass.value()-12,mid.value()-12,treble.value()-12,growl.value()/100f,speech.isChecked(),robot.value()/100f,echo.value()/100f,delay.value()+100));
-        for(Slider control:new Slider[]{pitch,tone,bass,mid,treble,growl,robot,echo,delay}){enabled(control.bar,bypass.isChecked());control.label.setAlpha(bypass.isChecked()?1f:0.5f);}
-        enabled(clarity,bypass.isChecked());enabled(speech,bypass.isChecked());
+        engine.setEffects(new EffectSettings(bypass.isChecked(),clarity.isChecked(),pitch.value()-6,tone.value()-6,bass.value()-12,mid.value()-12,treble.value()-12,growl.value()/100f,speech.isChecked(),robot.value()/100f,echo.value()/100f,delay.value()+100,noise.value()/100f,deEss.value()/100f,autoLevel.isChecked()));
+        for(Slider control:new Slider[]{pitch,tone,bass,mid,treble,growl,robot,echo,delay,noise,deEss}){enabled(control.bar,bypass.isChecked());control.label.setAlpha(bypass.isChecked()?1f:0.5f);}
+        enabled(clarity,bypass.isChecked());enabled(speech,bypass.isChecked());enabled(autoLevel,bypass.isChecked());
         String title=presetIndex>=0?presetTitles[presetIndex]:"Custom voice";presetName.setText(title);
-        for(int i=0;i<8;i++){presets[i].setBackground(shape(i==presetIndex?PALE:BG,14));presets[i].setTextColor(i==presetIndex?TEAL:INK);}
+        for(int i=0;i<presetTitles.length;i++){presets[i].setBackground(shape(i==presetIndex?PALE:BG,14));presets[i].setTextColor(i==presetIndex?TEAL:INK);}
         fxSummary.setText(!bypass.isChecked()?"Effects bypassed • natural voice":pitch.value()!=6?"Pitch shifting adds a short processing delay":echo.value()>0?"Echo timing changes repeat spacing, not Bluetooth delay":"Voice controls update during your session");
     }
     private void restoreSettings() {
-        changing=true;presetIndex=prefs.getInt("preset",0);if(presetIndex>7||presetIndex < -1)presetIndex=0;
-        gain.value(prefs.getInt("gain",90));pitch.value(prefs.getInt("pitch",6));tone.value(prefs.getInt("tone",6));bass.value(prefs.getInt("bass",12));mid.value(prefs.getInt("mid",12));treble.value(prefs.getInt("treble",12));growl.value(prefs.getInt("growl",0));speech.setChecked(prefs.getBoolean("speech",false));robot.value(prefs.getInt("robot",0));echo.value(prefs.getInt("echo",0));delay.value(prefs.getInt("delay",150));bypass.setChecked(prefs.getBoolean("fx",true));clarity.setChecked(prefs.getBoolean("clarity",false));changing=false;updateEffects();engine.setGain(0.1f+gain.value()/100f);
+        changing=true;presetIndex=prefs.getInt("preset",6);if(presetIndex>=presetTitles.length||presetIndex < -1)presetIndex=6;
+        EffectSettings defaults=VoicePresets.get(presetIndex);noise.value(prefs.getInt("noise",Math.round(defaults.noise*100)));deEss.value(prefs.getInt("deEss",Math.round(defaults.deEss*100)));autoLevel.setChecked(prefs.getBoolean("autoLevel",defaults.autoLevel));fast.setChecked(prefs.getBoolean("fast",true));engine.setPreferFast(fast.isChecked());
+        gain.value(prefs.getInt("gain",90));pitch.value(prefs.getInt("pitch",6));tone.value(prefs.getInt("tone",6));bass.value(prefs.getInt("bass",12));mid.value(prefs.getInt("mid",12));treble.value(prefs.getInt("treble",12));growl.value(prefs.getInt("growl",0));speech.setChecked(prefs.getBoolean("speech",false));robot.value(prefs.getInt("robot",0));echo.value(prefs.getInt("echo",0));delay.value(prefs.getInt("delay",150));bypass.setChecked(prefs.getBoolean("fx",true));clarity.setChecked(prefs.getBoolean("clarity",false));changing=false;updateEffects();engine.setGain(0.1f+gain.value()/100f);if(!prefs.contains("preset"))applyPreset(6);
     }
     private void saveSettings() {
-        prefs.edit().putInt("preset",presetIndex).putInt("gain",gain.value()).putInt("pitch",pitch.value()).putInt("tone",tone.value()).putInt("bass",bass.value()).putInt("mid",mid.value()).putInt("treble",treble.value()).putInt("growl",growl.value()).putBoolean("speech",speech.isChecked()).putInt("robot",robot.value()).putInt("echo",echo.value()).putInt("delay",delay.value()).putBoolean("fx",bypass.isChecked()).putBoolean("clarity",clarity.isChecked()).apply();
+        prefs.edit().putInt("noise",noise.value()).putInt("deEss",deEss.value()).putBoolean("autoLevel",autoLevel.isChecked()).putBoolean("fast",fast.isChecked()).putInt("preset",presetIndex).putInt("gain",gain.value()).putInt("pitch",pitch.value()).putInt("tone",tone.value()).putInt("bass",bass.value()).putInt("mid",mid.value()).putInt("treble",treble.value()).putInt("growl",growl.value()).putBoolean("speech",speech.isChecked()).putInt("robot",robot.value()).putInt("echo",echo.value()).putInt("delay",delay.value()).putBoolean("fx",bypass.isChecked()).putBoolean("clarity",clarity.isChecked()).apply();
     }
     private boolean hasPermissions(){return checkSelfPermission(Manifest.permission.RECORD_AUDIO)==PackageManager.PERMISSION_GRANTED&&(Build.VERSION.SDK_INT<31||checkSelfPermission(Manifest.permission.BLUETOOTH_CONNECT)==PackageManager.PERMISSION_GRANTED);}
     private void ensurePermissions(){List<String> p=new ArrayList<>();if(checkSelfPermission(Manifest.permission.RECORD_AUDIO)!=PackageManager.PERMISSION_GRANTED)p.add(Manifest.permission.RECORD_AUDIO);if(Build.VERSION.SDK_INT>=31&&checkSelfPermission(Manifest.permission.BLUETOOTH_CONNECT)!=PackageManager.PERMISSION_GRANTED)p.add(Manifest.permission.BLUETOOTH_CONNECT);if(!p.isEmpty())requestPermissions(p.toArray(new String[0]),1);else refreshDevices();}
@@ -225,10 +255,10 @@ public final class MainActivity extends Activity implements AudioEngine.Listener
         if(!hasPermissions()){ensurePermissions();return;}int i=input.getSelectedItemPosition(),o=output.getSelectedItemPosition();if(i<0||i>=inputs.size()||o<0||o>=outputs.size()){refreshDevices();return;}
         focus=new AudioFocusRequest.Builder(AudioManager.AUDIOFOCUS_GAIN).setAudioAttributes(new AudioAttributes.Builder().setUsage(AudioAttributes.USAGE_MEDIA).setContentType(AudioAttributes.CONTENT_TYPE_SPEECH).build()).setOnAudioFocusChangeListener(change->{if(change!=AudioManager.AUDIOFOCUS_GAIN&&active)stopAudio("Paused by another app or a call");},handler).setWillPauseWhenDucked(true).build();
         if(audio.requestAudioFocus(focus)!=AudioManager.AUDIOFOCUS_REQUEST_GRANTED){status.setText("Audio is busy. Stop other audio apps and retry.");focus=null;return;}
-        active=true;ready=false;isMuted=true;liveInputId=inputs.get(i).getId();liveOutputId=outputs.get(o).getId();enabled(input,false);enabled(output,false);enabled(refresh,false);start.setText("Stop session");enabled(mute,false);mute.setText("Unmute");status.setText("Checking your audio route • muted");route.setText("Waiting for microphone and speaker…");getWindow().addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);engine.start(inputs.get(i),outputs.get(o));
+        active=true;ready=false;isMuted=true;liveInputId=inputs.get(i).getId();liveOutputId=outputs.get(o).getId();enabled(input,false);enabled(output,false);enabled(refresh,false);enabled(fast,false);start.setText("Stop session");enabled(mute,false);mute.setText("Unmute");status.setText("Checking your audio route • muted");route.setText("Waiting for microphone and speaker…");getWindow().addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);engine.start(inputs.get(i),outputs.get(o));
     }
     private void toggleMute(){
-        if(!ready)return;
+        if(!ready||calibrating)return;
         int o=output.getSelectedItemPosition();
         if(isMuted&&o>=0&&o<outputs.size()&&(outputs.get(o).getType()==AudioDeviceInfo.TYPE_BUILTIN_SPEAKER||outputs.get(o).getType()==AudioDeviceInfo.TYPE_BUILTIN_EARPIECE)) {
             new AlertDialog.Builder(this).setTitle("Phone speaker feedback")
@@ -238,12 +268,14 @@ public final class MainActivity extends Activity implements AudioEngine.Listener
     }
     private void stopAudio(String reason){ready=false;enabled(mute,false);enabled(start,false);status.setText("Stopping session…");engine.stop(reason);}
     private void updateLiveState(){mute.setText(isMuted?"Unmute":"Mute now");mute.setBackground(shape(isMuted?PALE:0xFFFFE8E3,14));status.setText(isMuted?"Ready • muted · microphone listening":"Live • voice to speaker");}
-    @Override public void onReady(String actual){if(destroyed||!active||!engine.isRunning())return;ready=true;route.setText(actual);enabled(mute,true);updateLiveState();}
+    @Override public void onReady(String actual){if(destroyed||!active||!engine.isRunning())return;ready=true;route.setText(actual);enabled(calibrate,true);enabled(mute,true);updateLiveState();}
     @Override public void onMeter(float peak){if(destroyed||!active)return;meter.push(peak);float db=peak>0?(float)(20*Math.log10(peak)):-60;level.setText(String.format(Locale.UK,"Microphone peak  %.0f dBFS%s",Math.max(-60,db),peak>0.98f?" · input clipping":""));}
     @Override public void onStopped(String reason){
-        if(focus!=null){audio.abandonAudioFocusRequest(focus);focus=null;}active=false;ready=false;isMuted=true;if(destroyed)return;
+        if(focus!=null){audio.abandonAudioFocusRequest(focus);focus=null;}active=false;ready=false;calibrating=false;isMuted=true;if(destroyed)return;enabled(calibrate,false);enabled(fast,true);audioHealth.setText("Buffer diagnostics appear during a session.");calibrationStatus.setText("Start a muted session to calibrate background noise.");
         status.setText(reason);route.setText("Start muted. Unmute when you are ready.");meter.clear();level.setText("Microphone level  —");start.setText("Start session");mute.setText("Unmute");enabled(mute,false);mute.setBackground(shape(PALE,14));enabled(input,true);enabled(output,true);enabled(refresh,true);getWindow().clearFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);refreshDevices();
     }
+    @Override public void onAudioHealth(String details){if(!destroyed&&active)audioHealth.setText(details);}
+    @Override public void onCalibration(float noiseRms){if(destroyed||!ready)return;calibrating=false;enabled(calibrate,true);enabled(mute,true);float db=20*(float)Math.log10(Math.max(0.000001f,noiseRms));calibrationStatus.setText(String.format(Locale.UK,"Background measured: %.0f dBFS. %s",db,noiseRms>0.025f?"That was loud. Stay quiet and retry; noise reduction cannot remove speech or heavy room noise.":"Voice care adjusted for this session. You remain muted."));}
     @Override protected void onResume(){super.onResume();if(audio!=null&&!active)refreshDevices();}
     @Override protected void onStop(){saveSettings();if(active)stopAudio("Session stopped when app left the screen");super.onStop();}
     @Override protected void onDestroy(){destroyed=true;engine.stop("App closed");audio.unregisterAudioDeviceCallback(devices);if(focus!=null){audio.abandonAudioFocusRequest(focus);focus=null;}super.onDestroy();}

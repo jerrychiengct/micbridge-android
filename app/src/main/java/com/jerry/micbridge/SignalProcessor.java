@@ -6,6 +6,7 @@ import java.util.Arrays;
 public final class SignalProcessor {
     private final int rate;
     private final VoiceEqualizer eq;
+    private final VoiceEnhancer enhancer;
     private float speechEnvelope;
     private final float[] pitchBuffer, echoBuffer, work=new float[2048];
     private int pitchWrite, echoWrite;
@@ -16,8 +17,9 @@ public final class SignalProcessor {
     public SignalProcessor() { this(48000); }
     public SignalProcessor(int rate) {
         if(rate<8000 || rate>192000) throw new IllegalArgumentException("Unsupported sample rate");
-        this.rate=rate; eq=new VoiceEqualizer(rate); pitchBuffer=new float[rate/10]; echoBuffer=new float[rate];
+        this.rate=rate; eq=new VoiceEqualizer(rate); enhancer=new VoiceEnhancer(rate); pitchBuffer=new float[rate/10]; echoBuffer=new float[rate];
     }
+    public void setNoiseFloor(float rms){enhancer.setNoiseFloor(rms);}
     public float process(short[] input,int count,short[] output,float gain,boolean muted) {
         return process(input,count,output,gain,muted,EffectSettings.natural());
     }
@@ -32,7 +34,7 @@ public final class SignalProcessor {
             wasMuted=true; Arrays.fill(output,0,count*2,(short)0); return rawPeak;
         }
         wasMuted=false;
-        if(previous.enabled!=fx.enabled || previous.clarity!=fx.clarity || previous.speech!=fx.speech || previous.pitch!=fx.pitch || previous.echoMillis!=fx.echoMillis || (previous.echo>0 && fx.echo==0)) reset();
+        if(previous.enabled!=fx.enabled || previous.clarity!=fx.clarity || previous.speech!=fx.speech || previous.autoLevel!=fx.autoLevel || (previous.noise>0)!=(fx.noise>0) || (previous.deEss>0)!=(fx.deEss>0) || previous.pitch!=fx.pitch || previous.echoMillis!=fx.echoMillis || (previous.echo>0 && fx.echo==0)) reset();
         previous=fx;
         if(fx.enabled) eq.configure(fx.bass,fx.mid,fx.treble);
         float attack=(float)Math.exp(-1.0/(rate*0.010)), release=(float)Math.exp(-1.0/(rate*0.180));
@@ -49,6 +51,7 @@ public final class SignalProcessor {
                 if(fx.clarity) { float h=hpAlpha*(hpOut+x-hpIn); hpIn=x; hpOut=h; x=h; }
                 low+=alpha*(x-low); if(fx.tone!=0) x=low*warm+(x-low)*bright;
                 x=eq.process(x);
+                if(fx.noise>0||fx.deEss>0||fx.autoLevel)x=enhancer.process(x,fx);
                 pitchBuffer[pitchWrite]=x;
                 if(fx.pitch!=0) {
                     pitchPhase+=(1-ratio)/window; pitchPhase-=Math.floor(pitchPhase);
@@ -77,7 +80,7 @@ public final class SignalProcessor {
             work[i]=x*gain; effectedPeak=Math.max(effectedPeak,Math.abs(work[i]));
         }
         float target=effectedPeak>0.9f?0.9f/effectedPeak:1f;
-        limiter=target<limiter?target:Math.min(target,limiter+0.01f);
+        limiter=target<limiter?target:Math.min(target,limiter+count/(float)rate);
         for(int i=0;i<count;i++) {
             int value=Math.round(work[i]*limiter*32768);
             short sample=(short)Math.max(-29490,Math.min(29490,value));
@@ -91,7 +94,7 @@ public final class SignalProcessor {
         return (float)(pitchBuffer[index]*(1-fraction)+pitchBuffer[(index+1)%pitchBuffer.length]*fraction);
     }
     private void reset() {
-        Arrays.fill(pitchBuffer,0); Arrays.fill(echoBuffer,0); eq.reset(); speechEnvelope=0;
+        Arrays.fill(pitchBuffer,0); Arrays.fill(echoBuffer,0); eq.reset(); enhancer.reset(); speechEnvelope=0;
         pitchWrite=echoWrite=0; pitchPhase=robotPhase=0; low=hpIn=hpOut=0; limiter=1;
     }
 }

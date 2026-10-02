@@ -35,3 +35,7 @@ For low-delay speaking or singing, a wired audio interface or direct microphone-
 - [AudioTrack](https://developer.android.com/reference/android/media/AudioTrack)
 - [AudioRouting: preferred devices versus actual routes](https://developer.android.com/reference/android/media/AudioRouting)
 - [Audio latency](https://developer.android.com/ndk/guides/audio/audio-latency)
+
+## Generic Bluetooth speakers
+
+Unbranded speakers, BT Speaker / Wireless Speaker labels, and model-code-only devices are eligible when Android exposes an A2DP or LE Audio media output. Pair through Android settings, enable Media audio, test ordinary music, then choose the speaker in MicBridge. No brand whitelist is used. Generic labels are not proof of protocol support or measured latency. All Bluetooth speakers retain their own buffering; wired or USB playback is preferable when delay is distracting.
