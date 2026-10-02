@@ -2,6 +2,7 @@
 
 **Creator:** Jerry Chieng Chin Tung  
 **Public GitHub profile:** https://github.com/jerrychiengct  
+**Ko-fi:** https://ko-fi.com/jerrychiengct  
 **Personal contact:** [jerrychiengchintung@gmail.com](mailto:jerrychiengchintung@gmail.com)
 
 ## Report a problem
@@ -12,7 +13,9 @@ Do not send personal audio recordings or sensitive information unless separately
 
 ## Donate
 
-Donations are voluntary. Email Jerry personally with the subject **MicBridge — project support** to discuss the details. No donation payment is collected inside the app, and no payment processor or sponsor programme is currently advertised here.
+Support the project through **[Ko-fi](https://ko-fi.com/jerrychiengct)**. Contributions are voluntary. MicBridge opens Ko-fi in your browser; payment is handled by that external service.
+
+You can also email Jerry personally with the subject **MicBridge — project support** to discuss donation details. No donation payment is collected inside the app.
 
 ## Collaborate
 

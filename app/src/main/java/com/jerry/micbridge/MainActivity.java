@@ -74,7 +74,7 @@ public final class MainActivity extends Activity implements AudioEngine.Listener
         LinearLayout header=new LinearLayout(this);header.setGravity(Gravity.CENTER_VERTICAL);header.setPadding(dp(16),dp(10),dp(16),dp(10));
         ImageView logo=new ImageView(this);logo.setImageResource(R.mipmap.ic_launcher);logo.setContentDescription("MicBridge logo");LinearLayout.LayoutParams logoSize=new LinearLayout.LayoutParams(dp(36),dp(36));logoSize.rightMargin=dp(12);header.addView(logo,logoSize);
         LinearLayout brand=vertical();brand.addView(heading("MicBridge",24));brand.addView(text("VOICE TO SPEAKER",10,SUB));header.addView(brand,new LinearLayout.LayoutParams(0,-2,1));
-        TextView beta=text("BETA 0.4",11,TEAL);beta.setTypeface(Typeface.DEFAULT,Typeface.BOLD);beta.setPadding(dp(12),dp(8),dp(12),dp(8));beta.setBackground(shape(PALE,30));header.addView(beta);root.addView(header);
+        TextView beta=text("BETA 0.4.1",11,TEAL);beta.setTypeface(Typeface.DEFAULT,Typeface.BOLD);beta.setPadding(dp(12),dp(8),dp(12),dp(8));beta.setBackground(shape(PALE,30));header.addView(beta);root.addView(header);
         scroll=new ScrollView(this);scroll.setFillViewport(true);scroll.setClipToPadding(false);scroll.setPadding(dp(18),dp(8),dp(18),dp(8));
         LinearLayout content=vertical();scroll.addView(content);root.addView(scroll,new LinearLayout.LayoutParams(-1,0,1));
         for(int i=0;i<4;i++) { pages[i]=vertical();content.addView(pages[i]); }
@@ -180,9 +180,10 @@ public final class MainActivity extends Activity implements AudioEngine.Listener
         if(found==0)catalogCards.addView(text("No examples found. You can still connect an unlisted Bluetooth media speaker.",14,SUB));
     }
     private void buildAbout(LinearLayout page){
-        page.addView(heading("A voice worth sharing",26));page.addView(text("MicBridge 0.4.0 beta · Android 8+",13,SUB));
+        page.addView(heading("A voice worth sharing",26));page.addView(text("MicBridge 0.4.1 beta · Android 8+",13,SUB));
         LinearLayout creator=card(page);creator.addView(heading("Created by",16));creator.addView(heading(AppInfo.CREATOR,22));creator.addView(text("An independent project to make live speech amplification and creative voice tools more accessible. Built for lectures, presentations and everyday voice experiments.",14,SUB));
-        LinearLayout support=card(page);support.addView(heading("Support the project",20));support.addView(text("Visit my GitHub to follow my work and support development. If you would like to donate, please email me personally to discuss the details. Donations are voluntary.",14,SUB));
+        LinearLayout support=card(page);support.addView(heading("Support the project",20));support.addView(text("Visit my GitHub to follow development. You can support the project on Ko-fi, or email me personally. Support is voluntary; Ko-fi opens in your browser.",14,SUB));
+        Button kofi=button("Support on Ko-fi",TEAL);fullButton(support,kofi);kofi.setOnClickListener(v->openExternal(new Intent(Intent.ACTION_VIEW,Uri.parse(AppInfo.KOFI))));
         Button github=button("Visit my GitHub",TEAL);fullButton(support,github);github.setOnClickListener(v->openExternal(new Intent(Intent.ACTION_VIEW,Uri.parse(AppInfo.GITHUB))));
         Button project=button("Project repository",PALE);fullButton(support,project);project.setOnClickListener(v->openExternal(new Intent(Intent.ACTION_VIEW,Uri.parse(AppInfo.REPOSITORY))));support.addView(text("The project repository may require access and a GitHub sign-in.",12,SUB));
         support.addView(text(AppInfo.EMAIL,14,TEAL));Button donate=button("Email about a donation",PALE);fullButton(support,donate);donate.setOnClickListener(v->emailCreator("MicBridge — project support"));

@@ -1,5 +1,11 @@
 # Changelog
 
+## 0.4.1 beta — 2 October 2026
+
+- Support on Ko-fi button in About: https://ko-fi.com/jerrychiengct.
+- Ko-fi links in the README and support guide, with GitHub funding configuration.
+- External-service privacy information; donation / collaboration email remains available.
+
 ## 0.4.0 beta — 2 October 2026
 
 - Voice care with soft noise expansion, de-essing, bounded level assist and muted noise-floor calibration.

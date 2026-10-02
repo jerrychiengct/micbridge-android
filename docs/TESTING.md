@@ -19,6 +19,10 @@ The standalone Java suites passed:
 
 Run [the test script](../tests/run-tests.sh) using the [build guide](BUILDING.md).
 
+## 0.4.1 support-link patch
+
+This patch adds the creator-provided Ko-fi link to About and the repository support sections. APK compilation and signature verification were repeated. The audio engine is the 0.4.0 engine covered by the digital tests above; no new physical-device or UI validation is claimed.
+
 ## Physical validation still needed
 
 No phone or emulator UI session has been validated in this environment. No physical microphone / speaker pair or total acoustic delay is certified. The speaker guide is a list of examples, not a tested-device whitelist.

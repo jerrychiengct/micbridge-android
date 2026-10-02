@@ -4,9 +4,9 @@
 
 ## Download
 
-Download [MicBridge 0.4.0 beta](../dist/MicBridge-0.4.0-beta.apk), open the GitHub file page and choose **Download raw file**. Sign in with an account that has access to this private repository. Android 8.0+ is required. The APK is a test build, not a Play Store release.
+Download [MicBridge 0.4.1 beta](../dist/MicBridge-0.4.1-beta.apk), open the GitHub file page and choose **Download raw file**. Sign in with an account that has access to this private repository. Android 8.0+ is required. The APK is a test build, not a Play Store release.
 
-Open the downloaded APK on your phone. If Android asks, allow installation from the app you used to open the file. The supplied 0.4.0 APK uses the same test certificate as previous supplied betas and version code 4. An independently built APK may use a different key and require uninstalling the earlier build.
+Open the downloaded APK on your phone. If Android asks, allow installation from the app you used to open the file. The supplied 0.4.1 APK uses the same test certificate as previous supplied betas and version code 5. An independently built APK may use a different key and require uninstalling the earlier build.
 
 ## First session
 
@@ -39,20 +39,20 @@ Phone volume buttons adjust media volume. The app keeps the display awake while 
 
 ## Verify the downloaded APK
 
-SHA-256 for the supplied 0.4.0 beta:
+SHA-256 for the supplied 0.4.1 beta:
 
 ```text
-617c2c741958b9b334db08dff38c3bd92d2ba5c95655435c1a3727a7ae1b08bf
+11bce5542c988bdafe38fe6297556cf2425744d4984ceb0f634e8b05634bd071
 ```
 
 On Windows PowerShell:
 
 ```powershell
-Get-FileHash .\MicBridge-0.4.0-beta.apk -Algorithm SHA256
+Get-FileHash .\MicBridge-0.4.1-beta.apk -Algorithm SHA256
 ```
 
 On Linux:
 
 ```bash
-sha256sum MicBridge-0.4.0-beta.apk
+sha256sum MicBridge-0.4.1-beta.apk
 ```

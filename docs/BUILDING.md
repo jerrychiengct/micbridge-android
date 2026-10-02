@@ -31,7 +31,7 @@ MICBRIDGE_TOOLS="$ANDROID_HOME/build-tools/35.0.0" \
 ./build-apk.sh
 ```
 
-Output: `dist/MicBridge-0.4.0-beta.apk`. If no JDK compiler is available, `MICBRIDGE_ECJ` can point to an Eclipse ECJ JAR. Keep the locally generated signing key for consistent updates. Signing keys, SDK paths and build directories are excluded from git.
+Output: `dist/MicBridge-0.4.1-beta.apk`. If no JDK compiler is available, `MICBRIDGE_ECJ` can point to an Eclipse ECJ JAR. Keep the locally generated signing key for consistent updates. Signing keys, SDK paths and build directories are excluded from git.
 
 ## Digital tests
 

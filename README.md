@@ -3,10 +3,11 @@
 </p>
 
 <p align="center">
-  <a href="dist/MicBridge-0.4.0-beta.apk"><strong>Download beta APK</strong></a> ·
+  <a href="dist/MicBridge-0.4.1-beta.apk"><strong>Download beta APK</strong></a> ·
   <a href="docs/INSTALLATION.md">Get started</a> ·
   <a href="VOICE_PRESETS.md">Voice presets</a> ·
-  <a href="CONTRIBUTING.md">Collaborate</a>
+  <a href="CONTRIBUTING.md">Collaborate</a> ·
+  <a href="https://ko-fi.com/jerrychiengct">Support on Ko-fi</a>
 </p>
 
 # MicBridge
@@ -17,7 +18,7 @@ Made for **lectures, presentations and voice experiments** by **Jerry Chieng Chi
 
 ## Download and start
 
-**[Download MicBridge 0.4.0 beta](dist/MicBridge-0.4.0-beta.apk)** · Android 8.0 or newer · 2 October 2026
+**[Download MicBridge 0.4.1 beta](dist/MicBridge-0.4.1-beta.apk)** · Android 8.0 or newer · 2 October 2026
 
 Open the APK link, then choose **Download raw file** on GitHub. This repository is private: you need access and a signed-in GitHub account. This is an installable beta APK; there is no Play Store listing.
 
@@ -49,7 +50,7 @@ Keep MicBridge visible during playback. [Full installation guide and troubleshoo
 | **Live** | Select microphone and speaker, monitor input, calibrate noise and manage playback |
 | **Studio** | Pick a preset, adjust EQ and effects, or bypass processing |
 | **Speakers** | Read generic Bluetooth instructions and browse examples from 12 brands |
-| **About** | Find creator details, GitHub links and donation / collaboration email buttons |
+| **About** | Find creator details, GitHub and Ko-fi links, and donation / collaboration email buttons |
 
 The Material-style adaptive icon supports Android themed icons. The banner above is a branding graphic, not a device screenshot. Genuine interface screenshots will be added after capture on a phone or emulator; the screenshot instructions are in [Testing](docs/TESTING.md#capture-interface-screenshots).
 
@@ -75,7 +76,7 @@ Processing can improve levels and clarity, but cannot restore missing detail, re
 
 | Check | Current status |
 | --- | --- |
-| Android SDK 35 compilation / APK signature | Verified for 0.4.0 |
+| Android SDK 35 compilation / APK signature | Verified for 0.4.1 |
 | Digital audio and format-negotiation tests | Passed; scope documented in [Testing](docs/TESTING.md) |
 | Upgrade signing | Same test certificate as earlier supplied betas |
 | Physical microphone / speaker combinations | Awaiting documented hardware test results |
@@ -90,6 +91,7 @@ Created by **[Jerry Chieng Chin Tung](https://github.com/jerrychiengct)**. Andro
 
 - **Collaborate:** read [Contributing](CONTRIBUTING.md), then share an idea, improvement or hardware test report.
 - **Report a problem:** use the repository's [issue forms](https://github.com/jerrychiengct/micbridge-android/issues/new/choose) if you have access.
+- **Support on Ko-fi:** [ko-fi.com/jerrychiengct](https://ko-fi.com/jerrychiengct). Support is voluntary and opens an external service.
 - **Donate or contact Jerry:** email **[jerrychiengchintung@gmail.com](mailto:jerrychiengchintung@gmail.com?subject=MicBridge%20project%20support)** personally. Donations are voluntary; MicBridge does not collect payments.
 - **Follow other projects:** visit [Jerry's public GitHub profile](https://github.com/jerrychiengct). Repository access is still required for private project links.
 
