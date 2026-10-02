@@ -20,7 +20,10 @@ public final class MainActivity extends Activity implements AudioEngine.Listener
     private static final int BG=0xFFF3F6F7, PAPER=Color.WHITE, INK=0xFF142D36, SUB=0xFF58717A, TEAL=0xFF087F75, PALE=0xFFE4F2EF;
     private AudioManager audio; private AudioEngine engine; private SharedPreferences prefs;
     private final Handler handler=new Handler(Looper.getMainLooper());
-    private final List<AudioDeviceInfo> inputs=new ArrayList<>(),outputs=new ArrayList<>();
+    private Map<Integer,AudioDeviceInfo> inputs=Collections.emptyMap(),outputs=Collections.emptyMap();
+    private boolean refreshingDevices;
+    private final Runnable deviceRefresh=()->refreshDevices();
+    private void scheduleDeviceRefresh(){handler.removeCallbacks(deviceRefresh);handler.postDelayed(deviceRefresh,150);}
     private Spinner input,output;
     private Button start,mute,refresh,calibrate; private final Button[] tabs=new Button[4], presets=new Button[VoicePresets.TITLES.length];
     private TextView status,route,level,connectionCount,presetName,fxSummary,audioHealth,calibrationStatus;
@@ -33,10 +36,10 @@ public final class MainActivity extends Activity implements AudioEngine.Listener
     private AudioFocusRequest focus;
     private final String[] presetTitles=VoicePresets.TITLES,presetHints=VoicePresets.HINTS;
     private final AudioDeviceCallback devices=new AudioDeviceCallback() {
-        @Override public void onAudioDevicesAdded(AudioDeviceInfo[] added) { if(!active) refreshDevices(); }
+        @Override public void onAudioDevicesAdded(AudioDeviceInfo[] added) { if(!active) scheduleDeviceRefresh(); }
         @Override public void onAudioDevicesRemoved(AudioDeviceInfo[] removed) {
             for(AudioDeviceInfo d:removed) if(active&&(d.getId()==liveInputId||d.getId()==liveOutputId)) stopAudio("Device disconnected");
-            if(!active) refreshDevices();
+            if(!active) scheduleDeviceRefresh();
         }
     };
     @Override public void onCreate(Bundle saved) {
@@ -59,36 +62,36 @@ public final class MainActivity extends Activity implements AudioEngine.Listener
     private Button button(String label,int color) {
         Button b=new Button(this);b.setText(label);b.setTextSize(14);b.setAllCaps(false);b.setTypeface(Typeface.DEFAULT,Typeface.BOLD);
         b.setTextColor(color==TEAL?Color.WHITE:INK);b.setBackground(shape(color,14));b.setMinWidth(0);b.setMinimumWidth(0);
-        b.setPadding(dp(10),dp(5),dp(10),dp(5));b.setStateListAnimator(null);return b;
+        b.setMinHeight(dp(54));b.setPadding(dp(10),dp(5),dp(10),dp(5));b.setStateListAnimator(null);return b;
     }
     private void enabled(View view,boolean value){view.setEnabled(value);view.setAlpha(value?1f:0.45f);}
-    private void fullButton(LinearLayout p,Button b) { LinearLayout.LayoutParams lp=new LinearLayout.LayoutParams(-1,dp(50));lp.topMargin=dp(10);p.addView(b,lp); }
+    private void fullButton(LinearLayout p,Button b) { b.setMinHeight(dp(50)); LinearLayout.LayoutParams lp=new LinearLayout.LayoutParams(-1,-2);lp.topMargin=dp(10);p.addView(b,lp); }
     private void buildUi() {
         LinearLayout root=vertical();root.setBackgroundColor(BG);setContentView(root);
         root.setOnApplyWindowInsetsListener((v,insets)->{
-            int top,bottom;
-            if(Build.VERSION.SDK_INT>=30) { Insets n=insets.getInsets(WindowInsets.Type.systemBars());top=n.top;bottom=n.bottom; }
-            else { top=insets.getSystemWindowInsetTop();bottom=insets.getSystemWindowInsetBottom(); }
-            root.setPadding(0,top,0,bottom);return insets;
+            int top,bottom,left,right;
+            if(Build.VERSION.SDK_INT>=30) { Insets n=insets.getInsets(WindowInsets.Type.systemBars()|WindowInsets.Type.displayCutout());top=n.top;bottom=n.bottom;left=n.left;right=n.right; }
+            else { top=insets.getSystemWindowInsetTop();bottom=insets.getSystemWindowInsetBottom();left=insets.getSystemWindowInsetLeft();right=insets.getSystemWindowInsetRight(); }
+            root.setPadding(left,top,right,bottom);return insets;
         });
         LinearLayout header=new LinearLayout(this);header.setGravity(Gravity.CENTER_VERTICAL);header.setPadding(dp(16),dp(10),dp(16),dp(10));
         ImageView logo=new ImageView(this);logo.setImageResource(R.mipmap.ic_launcher);logo.setContentDescription("MicBridge logo");LinearLayout.LayoutParams logoSize=new LinearLayout.LayoutParams(dp(36),dp(36));logoSize.rightMargin=dp(12);header.addView(logo,logoSize);
         LinearLayout brand=vertical();brand.addView(heading("MicBridge",24));brand.addView(text("VOICE TO SPEAKER",10,SUB));header.addView(brand,new LinearLayout.LayoutParams(0,-2,1));
-        TextView beta=text("BETA 0.4.1",11,TEAL);beta.setTypeface(Typeface.DEFAULT,Typeface.BOLD);beta.setPadding(dp(12),dp(8),dp(12),dp(8));beta.setBackground(shape(PALE,30));header.addView(beta);root.addView(header);
+        TextView beta=text("BETA",11,TEAL);beta.setTypeface(Typeface.DEFAULT,Typeface.BOLD);beta.setPadding(dp(12),dp(8),dp(12),dp(8));beta.setBackground(shape(PALE,30));header.addView(beta);root.addView(header);
         scroll=new ScrollView(this);scroll.setFillViewport(true);scroll.setClipToPadding(false);scroll.setPadding(dp(18),dp(8),dp(18),dp(8));
         LinearLayout content=vertical();scroll.addView(content);root.addView(scroll,new LinearLayout.LayoutParams(-1,0,1));
         for(int i=0;i<4;i++) { pages[i]=vertical();content.addView(pages[i]); }
         buildLive(pages[0]);buildStudio(pages[1]);buildSpeakers(pages[2]);buildAbout(pages[3]);
         LinearLayout dock=vertical();dock.setBackgroundColor(PAPER);dock.setPadding(dp(20),dp(8),dp(20),0);
-        status=text("Connect a microphone and speaker",13,SUB);status.setMaxLines(3);dock.addView(status);
-        LinearLayout actions=new LinearLayout(this);start=button("Start session",TEAL);mute=button("Unmute",PALE);enabled(mute,false);
-        LinearLayout.LayoutParams a=new LinearLayout.LayoutParams(0,dp(54),1);a.setMargins(0,dp(4),dp(8),dp(6));actions.addView(start,a);
-        LinearLayout.LayoutParams b=new LinearLayout.LayoutParams(0,dp(54),1);b.setMargins(dp(8),dp(4),0,dp(6));actions.addView(mute,b);dock.addView(actions);
+        status=text("Connect a microphone and speaker",13,SUB);status.setMaxLines(3);status.setAccessibilityLiveRegion(View.ACCESSIBILITY_LIVE_REGION_POLITE);dock.addView(status);
+        LinearLayout actions=new LinearLayout(this);start=button("Start session",TEAL);enabled(start,false);mute=button("Unmute",PALE);enabled(mute,false);
+        LinearLayout.LayoutParams a=new LinearLayout.LayoutParams(0,-2,1);a.setMargins(0,dp(4),dp(8),dp(6));actions.addView(start,a);
+        LinearLayout.LayoutParams b=new LinearLayout.LayoutParams(0,-2,1);b.setMargins(dp(8),dp(4),0,dp(6));actions.addView(mute,b);dock.addView(actions);
         start.setOnClickListener(v->{if(active)stopAudio("Session stopped");else startAudio();});
         mute.setOnClickListener(v->toggleMute());
         LinearLayout nav=new LinearLayout(this);
         String[] labels={"Live","Studio","Speakers","About"};
-        for(int i=0;i<4;i++) { final int n=i;tabs[i]=button(labels[i],PAPER);tabs[i].setTextSize(12);nav.addView(tabs[i],new LinearLayout.LayoutParams(0,dp(54),1));tabs[i].setOnClickListener(v->showPage(n)); }
+        for(int i=0;i<4;i++) { final int n=i;tabs[i]=button(labels[i],PAPER);tabs[i].setTextSize(12);nav.addView(tabs[i],new LinearLayout.LayoutParams(0,-2,1));tabs[i].setOnClickListener(v->showPage(n)); }
         dock.addView(nav);root.addView(dock);showPage(0);
     }
     private void buildLive(LinearLayout page) {
@@ -99,9 +102,9 @@ public final class MainActivity extends Activity implements AudioEngine.Listener
         level=text("Microphone level  —",13,0xFFB5D7D9);hero.addView(level);
         route=text("Start muted. Unmute when you are ready.",12,0xFFB5D7D9);hero.addView(route);
         LinearLayout connections=card(page);connections.addView(heading("Your connection",20));connectionCount=text("Built-in or connected mic + your audio output",12,SUB);connections.addView(connectionCount);
-        connections.addView(text("MICROPHONE INPUT",11,TEAL));input=new Spinner(this);connections.addView(input,new LinearLayout.LayoutParams(-1,dp(52)));
-        connections.addView(text("SPEAKER OUTPUT",11,TEAL));output=new Spinner(this);connections.addView(output,new LinearLayout.LayoutParams(-1,dp(52)));
-        connections.addView(text("Device names come from Android. Bluetooth headset microphones may require a paired hands-free output; combinations that Android cannot route will stay muted.",12,SUB));
+        connections.addView(text("MICROPHONE INPUT",11,TEAL));input=new Spinner(this);input.setContentDescription("Choose microphone input");input.setMinimumHeight(dp(52));connections.addView(input,new LinearLayout.LayoutParams(-1,-2));
+        connections.addView(text("SPEAKER OUTPUT",11,TEAL));output=new Spinner(this);output.setContentDescription("Choose speaker output");output.setMinimumHeight(dp(52));connections.addView(output,new LinearLayout.LayoutParams(-1,-2));
+        connections.addView(text("Only connected media routes appear here. Hands-free Bluetooth microphones and phone earpieces are excluded. Same-name ports are numbered; Bluetooth media and LE Audio are different routes. Android must verify your choice before Unmute.",12,SUB));
         refresh=button("Refresh connected devices",PALE);fullButton(connections,refresh);refresh.setOnClickListener(v->ensurePermissions());
         Button pair=button("Pair a Bluetooth speaker",BG);fullButton(connections,pair);pair.setOnClickListener(v->openExternal(new Intent(Settings.ACTION_BLUETOOTH_SETTINGS)));
         fast=new Switch(this);fast.setText("Prefer shorter latency buffers");fast.setTextColor(INK);fast.setTextSize(14);fast.setChecked(true);connections.addView(fast);
@@ -126,7 +129,7 @@ public final class MainActivity extends Activity implements AudioEngine.Listener
         for(int row=0;row<presetTitles.length/2;row++) { LinearLayout line=new LinearLayout(this);
             if(row==4){choices.addView(heading("Studio collection",18));choices.addView(text("Original tunings inspired by professional voice chains. No paid plug-ins required.",12,SUB));}
             for(int col=0;col<2;col++) { final int index=row*2+col;Button p=button(presetTitles[index]+"\n"+presetHints[index],BG);p.setTextSize(12);presets[index]=p;
-                LinearLayout.LayoutParams lp=new LinearLayout.LayoutParams(0,dp(68),1);lp.setMargins(col==0?0:dp(5),dp(8),col==0?dp(5):0,0);line.addView(p,lp);p.setOnClickListener(v->applyPreset(index)); }
+                p.setMinHeight(dp(68));LinearLayout.LayoutParams lp=new LinearLayout.LayoutParams(0,-2,1);lp.setMargins(col==0?0:dp(5),dp(8),col==0?dp(5):0,0);line.addView(p,lp);p.setOnClickListener(v->applyPreset(index)); }
             choices.addView(line);
         }
         LinearLayout controls=card(page);controls.addView(heading("Sound modulator",20));
@@ -180,7 +183,7 @@ public final class MainActivity extends Activity implements AudioEngine.Listener
         if(found==0)catalogCards.addView(text("No examples found. You can still connect an unlisted Bluetooth media speaker.",14,SUB));
     }
     private void buildAbout(LinearLayout page){
-        page.addView(heading("A voice worth sharing",26));page.addView(text("MicBridge 0.4.1 beta · Android 8+",13,SUB));
+        page.addView(heading("A voice worth sharing",26));page.addView(text("MicBridge 0.4.2 beta · Android 8+",13,SUB));
         LinearLayout creator=card(page);creator.addView(heading("Created by",16));creator.addView(heading(AppInfo.CREATOR,22));creator.addView(text("An independent project to make live speech amplification and creative voice tools more accessible. Built for lectures, presentations and everyday voice experiments.",14,SUB));
         LinearLayout support=card(page);support.addView(heading("Support the project",20));support.addView(text("Visit my GitHub to follow development. You can support the project on Ko-fi, or email me personally. Support is voluntary; Ko-fi opens in your browser.",14,SUB));
         Button kofi=button("Support on Ko-fi",TEAL);fullButton(support,kofi);kofi.setOnClickListener(v->openExternal(new Intent(Intent.ACTION_VIEW,Uri.parse(AppInfo.KOFI))));
@@ -195,7 +198,7 @@ public final class MainActivity extends Activity implements AudioEngine.Listener
         try{startActivity(new Intent(Intent.ACTION_SENDTO,Uri.parse("mailto:"+AppInfo.EMAIL+"?subject="+Uri.encode(subject))));}
         catch(ActivityNotFoundException error){android.content.ClipboardManager clipboard=(android.content.ClipboardManager)getSystemService(CLIPBOARD_SERVICE);clipboard.setPrimaryClip(ClipData.newPlainText("MicBridge creator email",AppInfo.EMAIL));Toast.makeText(this,"Email address copied: "+AppInfo.EMAIL,Toast.LENGTH_LONG).show();}
     }
-    private void showPage(int index) {for(int i=0;i<4;i++){pages[i].setVisibility(i==index?View.VISIBLE:View.GONE);tabs[i].setBackground(shape(i==index?PALE:PAPER,14));tabs[i].setTextColor(i==index?TEAL:SUB);}scroll.scrollTo(0,0);}
+    private void showPage(int index) {for(int i=0;i<4;i++){pages[i].setVisibility(i==index?View.VISIBLE:View.GONE);tabs[i].setBackground(shape(i==index?PALE:PAPER,14));tabs[i].setTextColor(i==index?TEAL:SUB);tabs[i].setSelected(i==index);}scroll.scrollTo(0,0);}
     private final class Slider {
         final SeekBar bar;final TextView label;final String title;final Formatter formatter;Runnable callback;
         Slider(LinearLayout parent,String title,int max,int value,Formatter f) {
@@ -231,43 +234,75 @@ public final class MainActivity extends Activity implements AudioEngine.Listener
     private boolean hasPermissions(){return checkSelfPermission(Manifest.permission.RECORD_AUDIO)==PackageManager.PERMISSION_GRANTED&&(Build.VERSION.SDK_INT<31||checkSelfPermission(Manifest.permission.BLUETOOTH_CONNECT)==PackageManager.PERMISSION_GRANTED);}
     private void ensurePermissions(){List<String> p=new ArrayList<>();if(checkSelfPermission(Manifest.permission.RECORD_AUDIO)!=PackageManager.PERMISSION_GRANTED)p.add(Manifest.permission.RECORD_AUDIO);if(Build.VERSION.SDK_INT>=31&&checkSelfPermission(Manifest.permission.BLUETOOTH_CONNECT)!=PackageManager.PERMISSION_GRANTED)p.add(Manifest.permission.BLUETOOTH_CONNECT);if(!p.isEmpty())requestPermissions(p.toArray(new String[0]),1);else refreshDevices();}
     @Override public void onRequestPermissionsResult(int code,String[] p,int[] g){super.onRequestPermissionsResult(code,p,g);if(hasPermissions())refreshDevices();else{status.setText("Allow Microphone and Nearby devices in app permissions, then Refresh.");enabled(start,false);}}
+    private int selectedId(Spinner spinner){Object item=spinner.getSelectedItem();return item instanceof DeviceChoices.Row?((DeviceChoices.Row)item).id:-1;}
+    private void selectionChanged(){if(!refreshingDevices&&!active)enabled(start,inputs.containsKey(selectedId(input))&&outputs.containsKey(selectedId(output)));}
     private void refreshDevices(){
-        if(destroyed||active||!hasPermissions())return;
-        int oldIn=selectedId(input,inputs),oldOut=selectedId(output,outputs);inputs.clear();outputs.clear();
+        if(destroyed||active)return;
+        int oldIn=selectedId(input),oldOut=selectedId(output);
+        Map<Integer,AudioDeviceInfo> newInputs=new HashMap<>(),newOutputs=new HashMap<>();
+        List<DeviceChoices.Row> inRows=new ArrayList<>(),outRows=new ArrayList<>();
         try{
-            // Connected physical devices first; built-in routes remain explicit alternatives.
-            for(AudioDeviceInfo d:audio.getDevices(AudioManager.GET_DEVICES_INPUTS))if(physical(d)&&d.getType()!=AudioDeviceInfo.TYPE_BUILTIN_MIC)inputs.add(d);
-            for(AudioDeviceInfo d:audio.getDevices(AudioManager.GET_DEVICES_INPUTS))if(d.getType()==AudioDeviceInfo.TYPE_BUILTIN_MIC)inputs.add(d);
-            for(AudioDeviceInfo d:audio.getDevices(AudioManager.GET_DEVICES_OUTPUTS))if(physical(d)&&d.getType()!=AudioDeviceInfo.TYPE_BUILTIN_SPEAKER&&d.getType()!=AudioDeviceInfo.TYPE_BUILTIN_EARPIECE)outputs.add(d);
-            for(AudioDeviceInfo d:audio.getDevices(AudioManager.GET_DEVICES_OUTPUTS))if(d.getType()==AudioDeviceInfo.TYPE_BUILTIN_SPEAKER||d.getType()==AudioDeviceInfo.TYPE_BUILTIN_EARPIECE)outputs.add(d);
-            populate(input,inputs,oldIn,"No microphone detected");populate(output,outputs,oldOut,"No audio output detected");enabled(start,!inputs.isEmpty()&&!outputs.isEmpty());
-            connectionCount.setText(inputs.size()+" microphone option(s)  ·  "+outputs.size()+" audio output(s)");
-            if(!active&&outputs.isEmpty())status.setText("Pair your speaker, then tap Refresh");
-        }catch(SecurityException e){status.setText("Nearby devices permission required. Tap Refresh.");enabled(start,false);}
+            if(!hasPermissions())throw new SecurityException();
+            // One snapshot for both directions; repeated IDs cannot create duplicate rows.
+            for(AudioDeviceInfo device:audio.getDevices(AudioManager.GET_DEVICES_ALL)){
+                String type=connection(device);if(type==null)continue;
+                boolean builtIn=device.getType()==AudioDeviceInfo.TYPE_BUILTIN_MIC||device.getType()==AudioDeviceInfo.TYPE_BUILTIN_SPEAKER;
+                DeviceChoices.Row row=new DeviceChoices.Row(device.getId(),AudioEngine.deviceName(device),type,builtIn);
+                if(device.isSource()&&inputType(device)&&!newInputs.containsKey(device.getId())){newInputs.put(device.getId(),device);inRows.add(row);}
+                if(device.isSink()&&outputType(device)&&!newOutputs.containsKey(device.getId())){newOutputs.put(device.getId(),device);outRows.add(row);}
+            }
+        }catch(SecurityException error){newInputs.clear();newOutputs.clear();inRows.clear();outRows.clear();status.setText("Allow Microphone and Nearby devices, then Refresh.");}
+        refreshingDevices=true;
+        inputs=Collections.unmodifiableMap(newInputs);outputs=Collections.unmodifiableMap(newOutputs);
+        populate(input,DeviceChoices.build(inRows,inRows.isEmpty()?"No microphone detected":"Choose microphone"),oldIn);
+        populate(output,DeviceChoices.build(outRows,outRows.isEmpty()?"No speaker detected":"Choose speaker"),oldOut);
+        refreshingDevices=false;selectionChanged();
+        connectionCount.setText(inputs.size()+" microphone route(s) · "+outputs.size()+" speaker route(s)");
+        if((oldIn>=0&&!inputs.containsKey(oldIn))||(oldOut>=0&&!outputs.containsKey(oldOut)))status.setText("Selected device disconnected. Choose an available microphone and speaker.");
     }
-    private int selectedId(Spinner s,List<AudioDeviceInfo> list){int i=s.getSelectedItemPosition();return i>=0&&i<list.size()?list.get(i).getId():-1;}
-    private boolean physical(AudioDeviceInfo d){int t=d.getType();return t!=AudioDeviceInfo.TYPE_UNKNOWN&&t!=AudioDeviceInfo.TYPE_TELEPHONY&&t!=AudioDeviceInfo.TYPE_REMOTE_SUBMIX&&t!=AudioDeviceInfo.TYPE_FM_TUNER&&t!=AudioDeviceInfo.TYPE_TV_TUNER&&t!=AudioDeviceInfo.TYPE_FM;}
-    private String connection(AudioDeviceInfo d){int t=d.getType();if(t==AudioDeviceInfo.TYPE_BLUETOOTH_A2DP)return "Bluetooth media";if(t==AudioDeviceInfo.TYPE_BLUETOOTH_SCO)return "Bluetooth hands-free";if(Build.VERSION.SDK_INT>=31&&(t==AudioDeviceInfo.TYPE_BLE_SPEAKER||t==AudioDeviceInfo.TYPE_BLE_HEADSET))return "LE Audio";if(t==AudioDeviceInfo.TYPE_BUILTIN_MIC||t==AudioDeviceInfo.TYPE_BUILTIN_SPEAKER||t==AudioDeviceInfo.TYPE_BUILTIN_EARPIECE)return "Built-in";if(t==AudioDeviceInfo.TYPE_HDMI||t==AudioDeviceInfo.TYPE_HDMI_ARC||t==AudioDeviceInfo.TYPE_HDMI_EARC)return "HDMI";return "Connected audio";}
-    private void populate(Spinner s,List<AudioDeviceInfo> list,int previous,String empty){
-        List<String> names=new ArrayList<>();int selected=0;for(int i=0;i<list.size();i++){names.add(AudioEngine.deviceName(list.get(i))+" · "+connection(list.get(i)));if(list.get(i).getId()==previous)selected=i;}if(names.isEmpty())names.add(empty);
-        ArrayAdapter<String> adapter=new ArrayAdapter<>(this,android.R.layout.simple_spinner_item,names);adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);s.setAdapter(adapter);s.setSelection(selected);
+    private boolean inputType(AudioDeviceInfo d){int t=d.getType();return t==AudioDeviceInfo.TYPE_BUILTIN_MIC||t==AudioDeviceInfo.TYPE_WIRED_HEADSET||t==AudioDeviceInfo.TYPE_USB_DEVICE||t==AudioDeviceInfo.TYPE_USB_HEADSET||t==AudioDeviceInfo.TYPE_USB_ACCESSORY||t==AudioDeviceInfo.TYPE_LINE_ANALOG||t==AudioDeviceInfo.TYPE_LINE_DIGITAL;}
+    private boolean outputType(AudioDeviceInfo d){return d.getType()!=AudioDeviceInfo.TYPE_BUILTIN_MIC;}
+    private String connection(AudioDeviceInfo d){
+        switch(d.getType()){
+            case AudioDeviceInfo.TYPE_BUILTIN_MIC:case AudioDeviceInfo.TYPE_BUILTIN_SPEAKER:return "Built-in";
+            case AudioDeviceInfo.TYPE_USB_DEVICE:case AudioDeviceInfo.TYPE_USB_HEADSET:case AudioDeviceInfo.TYPE_USB_ACCESSORY:return "USB audio";
+            case AudioDeviceInfo.TYPE_WIRED_HEADSET:case AudioDeviceInfo.TYPE_WIRED_HEADPHONES:return "Wired audio";
+            case AudioDeviceInfo.TYPE_BLUETOOTH_A2DP:return "Bluetooth media";
+            case AudioDeviceInfo.TYPE_BLE_HEADSET:case AudioDeviceInfo.TYPE_BLE_SPEAKER:case AudioDeviceInfo.TYPE_BLE_BROADCAST:return "LE Audio";
+            case AudioDeviceInfo.TYPE_HEARING_AID:return "Hearing aid audio";
+            case AudioDeviceInfo.TYPE_LINE_ANALOG:case AudioDeviceInfo.TYPE_LINE_DIGITAL:return "Line audio";
+            case AudioDeviceInfo.TYPE_HDMI:case AudioDeviceInfo.TYPE_HDMI_ARC:case AudioDeviceInfo.TYPE_HDMI_EARC:return "HDMI audio";
+            case AudioDeviceInfo.TYPE_DOCK:return "Dock audio";
+            default:return null; // virtual buses, telephony, safe-speaker aliases and unknown routes
+        }
+    }
+    private void populate(Spinner spinner,List<DeviceChoices.Row> rows,int previous){
+        ArrayAdapter<DeviceChoices.Row> adapter=new ArrayAdapter<DeviceChoices.Row>(this,android.R.layout.simple_spinner_item,rows){
+            private View style(View view){TextView label=(TextView)view;label.setSingleLine(false);label.setMaxLines(4);label.setTextSize(14);label.setMinHeight(dp(52));label.setGravity(Gravity.CENTER_VERTICAL);label.setPadding(dp(10),dp(8),dp(10),dp(8));return view;}
+            @Override public View getView(int position,View convert,ViewGroup parent){return style(super.getView(position,convert,parent));}
+            @Override public View getDropDownView(int position,View convert,ViewGroup parent){return style(super.getDropDownView(position,convert,parent));}
+        };
+        adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);spinner.setAdapter(adapter);spinner.setSelection(DeviceChoices.position(rows,previous));
+        spinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener(){public void onItemSelected(AdapterView<?> parent,View view,int position,long id){selectionChanged();}public void onNothingSelected(AdapterView<?> parent){selectionChanged();}});
     }
     private void startAudio(){
-        if(!hasPermissions()){ensurePermissions();return;}int i=input.getSelectedItemPosition(),o=output.getSelectedItemPosition();if(i<0||i>=inputs.size()||o<0||o>=outputs.size()){refreshDevices();return;}
+        if(!hasPermissions()){ensurePermissions();return;}refreshDevices();
+        AudioDeviceInfo selectedInput=inputs.get(selectedId(input)),selectedOutput=outputs.get(selectedId(output));
+        if(selectedInput==null||selectedOutput==null){status.setText("Choose an available microphone and speaker first.");return;}
         focus=new AudioFocusRequest.Builder(AudioManager.AUDIOFOCUS_GAIN).setAudioAttributes(new AudioAttributes.Builder().setUsage(AudioAttributes.USAGE_MEDIA).setContentType(AudioAttributes.CONTENT_TYPE_SPEECH).build()).setOnAudioFocusChangeListener(change->{if(change!=AudioManager.AUDIOFOCUS_GAIN&&active)stopAudio("Paused by another app or a call");},handler).setWillPauseWhenDucked(true).build();
         if(audio.requestAudioFocus(focus)!=AudioManager.AUDIOFOCUS_REQUEST_GRANTED){status.setText("Audio is busy. Stop other audio apps and retry.");focus=null;return;}
-        active=true;ready=false;isMuted=true;liveInputId=inputs.get(i).getId();liveOutputId=outputs.get(o).getId();enabled(input,false);enabled(output,false);enabled(refresh,false);enabled(fast,false);start.setText("Stop session");enabled(mute,false);mute.setText("Unmute");status.setText("Checking your audio route • muted");route.setText("Waiting for microphone and speaker…");getWindow().addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);engine.start(inputs.get(i),outputs.get(o));
+        active=true;ready=false;isMuted=true;liveInputId=selectedInput.getId();liveOutputId=selectedOutput.getId();enabled(input,false);enabled(output,false);enabled(refresh,false);enabled(fast,false);start.setText("Stop session");enabled(mute,false);mute.setText("Unmute");status.setText("Checking your audio route • muted");route.setText("Waiting for microphone and speaker…");getWindow().addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);if(!engine.start(selectedInput,selectedOutput))onStopped("Audio is still stopping. Please retry.");
     }
     private void toggleMute(){
         if(!ready||calibrating)return;
-        int o=output.getSelectedItemPosition();
-        if(isMuted&&o>=0&&o<outputs.size()&&(outputs.get(o).getType()==AudioDeviceInfo.TYPE_BUILTIN_SPEAKER||outputs.get(o).getType()==AudioDeviceInfo.TYPE_BUILTIN_EARPIECE)) {
+        AudioDeviceInfo selectedOutput=outputs.get(liveOutputId);
+        if(isMuted&&selectedOutput!=null&&selectedOutput.getType()==AudioDeviceInfo.TYPE_BUILTIN_SPEAKER) {
             new AlertDialog.Builder(this).setTitle("Phone speaker feedback")
                 .setMessage("The phone speaker is close to the microphone and may squeal. Start at very low volume. A separate speaker works better for lectures.")
-                .setPositiveButton("Unmute",(d,w)->{if(ready){isMuted=false;engine.setMuted(false);updateLiveState();}}).setNegativeButton("Stay muted",null).show();
+                .setPositiveButton("Unmute",(d,w)->{if(ready&&!calibrating&&engine.isRunning()){isMuted=false;engine.setMuted(false);updateLiveState();}}).setNegativeButton("Stay muted",null).show();
         }else{isMuted=!isMuted;engine.setMuted(isMuted);updateLiveState();}
     }
-    private void stopAudio(String reason){ready=false;enabled(mute,false);enabled(start,false);status.setText("Stopping session…");engine.stop(reason);}
+    private void stopAudio(String reason){ready=false;enabled(mute,false);enabled(calibrate,false);enabled(start,false);status.setText("Stopping session…");engine.stop(reason);}
     private void updateLiveState(){mute.setText(isMuted?"Unmute":"Mute now");mute.setBackground(shape(isMuted?PALE:0xFFFFE8E3,14));status.setText(isMuted?"Ready • muted · microphone listening":"Live • voice to speaker");}
     @Override public void onReady(String actual){if(destroyed||!active||!engine.isRunning())return;ready=true;route.setText(actual);enabled(calibrate,true);enabled(mute,true);updateLiveState();}
     @Override public void onMeter(float peak){if(destroyed||!active)return;meter.push(peak);float db=peak>0?(float)(20*Math.log10(peak)):-60;level.setText(String.format(Locale.UK,"Microphone peak  %.0f dBFS%s",Math.max(-60,db),peak>0.98f?" · input clipping":""));}
@@ -279,5 +314,5 @@ public final class MainActivity extends Activity implements AudioEngine.Listener
     @Override public void onCalibration(float noiseRms){if(destroyed||!ready)return;calibrating=false;enabled(calibrate,true);enabled(mute,true);float db=20*(float)Math.log10(Math.max(0.000001f,noiseRms));calibrationStatus.setText(String.format(Locale.UK,"Background measured: %.0f dBFS. %s",db,noiseRms>0.025f?"That was loud. Stay quiet and retry; noise reduction cannot remove speech or heavy room noise.":"Voice care adjusted for this session. You remain muted."));}
     @Override protected void onResume(){super.onResume();if(audio!=null&&!active)refreshDevices();}
     @Override protected void onStop(){saveSettings();if(active)stopAudio("Session stopped when app left the screen");super.onStop();}
-    @Override protected void onDestroy(){destroyed=true;engine.stop("App closed");audio.unregisterAudioDeviceCallback(devices);if(focus!=null){audio.abandonAudioFocusRequest(focus);focus=null;}super.onDestroy();}
+    @Override protected void onDestroy(){destroyed=true;handler.removeCallbacks(deviceRefresh);engine.stop("App closed");audio.unregisterAudioDeviceCallback(devices);if(focus!=null){audio.abandonAudioFocusRequest(focus);focus=null;}super.onDestroy();}
 }

@@ -12,3 +12,11 @@ Bluetooth buffering cannot be removed by this app. Pitch processing and echo alt
 
 
 See [Testing](TESTING.md) for validation scope and [Installation](INSTALLATION.md) for first use.
+
+## Connected-device identity
+
+Both selectors are built from a single `AudioManager.getDevices(GET_DEVICES_ALL)` snapshot. Source/sink flags and supported route categories determine each list. Repeated Android IDs are removed; product names are never used to merge distinct endpoints. Same-name ports are numbered, and media versus LE Audio profiles are labelled separately. Hands-free SCO, phone earpiece, safe-speaker aliases, unknown and virtual system endpoints are excluded. This engine does not establish a Bluetooth communication session.
+
+Rows carry their own device ID. Selection restoration uses that ID; a missing ID returns to an explicit prompt. Before starting, the app takes a fresh snapshot and resolves both selections again. AudioRecord/AudioTrack preferences must be accepted, then their actual routed device IDs must match before voice is enabled. A changed route stops the session. Addresses and device choices are not persisted.
+
+Android references: [AudioManager.getDevices](https://developer.android.com/reference/android/media/AudioManager#getDevices(int)), [AudioDeviceInfo](https://developer.android.com/reference/android/media/AudioDeviceInfo), [preferred versus actual routing](https://developer.android.com/reference/android/media/AudioRouting). A preferred device does not guarantee the actual route; hardware validation is still necessary.

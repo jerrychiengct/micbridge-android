@@ -35,14 +35,15 @@ public final class AudioEngine {
 
     public void setEffects(EffectSettings value) { effects = value; }
 
-    public void start(AudioDeviceInfo input, AudioDeviceInfo output) {
-        if (thread != null && thread.isAlive()) return;
+    public boolean start(AudioDeviceInfo input, AudioDeviceInfo output) {
+        if (thread != null && thread.isAlive()) return false;
         muted = true;
         calibrationRequested=false;
         running = true;
         stopReason = "Stopped";
         thread = new Thread(() -> pump(input, output), "MicBridge-audio");
         thread.start();
+        return true;
     }
 
     public void stop(String reason) {
@@ -86,8 +87,8 @@ public final class AudioEngine {
     }
 
     private void pump(AudioDeviceInfo input, AudioDeviceInfo output) {
-        android.os.Process.setThreadPriority(android.os.Process.THREAD_PRIORITY_AUDIO);
         try {
+            android.os.Process.setThreadPriority(android.os.Process.THREAD_PRIORITY_AUDIO);
             int rate=0,channels=1;RuntimeException last=null;
             int preferredChannels=1;int[] advertised=input.getChannelCounts();boolean mono=false,stereo=false;
             for(int c:advertised){mono|=c==1;stereo|=c==2;}if(stereo&&!mono)preferredChannels=2;
@@ -178,7 +179,8 @@ public final class AudioEngine {
     }
 
     public static String deviceName(AudioDeviceInfo device) {
-        String name = device.getProductName().toString().trim();
+        CharSequence product=device.getProductName();
+        String name = product==null?"":product.toString().trim();
         if(device.getType()==AudioDeviceInfo.TYPE_BUILTIN_MIC) return "Phone microphone";
         if(device.getType()==AudioDeviceInfo.TYPE_BUILTIN_SPEAKER) return "Phone speaker";
         if(device.getType()==AudioDeviceInfo.TYPE_BUILTIN_EARPIECE) return "Phone earpiece";

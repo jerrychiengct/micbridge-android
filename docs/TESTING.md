@@ -2,9 +2,9 @@
 
 [← Project overview](../README.md)
 
-## Verified for beta 0.4.0
+## Verified for beta 0.4.2
 
-The APK was compiled against Android SDK 35, converted to DEX and verified with Android APK signature tools. Version code 4 and the signing certificate match the intended upgrade path from earlier supplied betas.
+The APK was compiled against Android SDK 35, converted to DEX and verified with Android APK signature tools. Version code 6 and the signing certificate match the intended upgrade path from earlier supplied betas.
 
 The standalone Java suites passed:
 
@@ -17,11 +17,17 @@ The standalone Java suites passed:
 - Both approximately 5 ms and 10 ms processing-block paths.
 - Sample-rate negotiation, stereo downmix without overflow and buffer-growth capacity limits.
 
+- Device selector identity across reordered snapshots, repeated-ID removal, distinct same-name ports, stable labels, explicit empty selections, disconnect handling and immutable rows.
+
 Run [the test script](../tests/run-tests.sh) using the [build guide](BUILDING.md).
 
 ## 0.4.1 support-link patch
 
 This patch adds the creator-provided Ko-fi link to About and the repository support sections. APK compilation and signature verification were repeated. The audio engine is the 0.4.0 engine covered by the digital tests above; no new physical-device or UI validation is claimed.
+
+## 0.4.2 routing and interface review
+
+The selector tests and both existing audio suites passed. APK compilation, manifest version/permissions, alignment and signature checks passed. The supplied APK uses the earlier beta certificate. Source review covered selector event handling, fresh start preflight, hotplug handling, supported media-route categories, permission loss, worker start rejection and calibration/unmute guards. UI changes were reviewed in source only; no rendered UI or Android runtime routing test is claimed.
 
 ## Physical validation still needed
 

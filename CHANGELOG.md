@@ -1,5 +1,16 @@
 # Changelog
 
+## 0.4.2 beta — 2 October 2026
+
+- One snapshot for input/output discovery, repeated-ID removal and stable device-ID selection.
+- Explicit selection prompts; disconnecting a choice never silently selects another device.
+- Fresh availability check before starting, coalesced connection callbacks and cleared stale lists after permission loss.
+- Filtered hands-free, earpiece and virtual routes; retained generic Bluetooth media, LE Audio, built-in, USB and wired support. Distinct same-name ports are numbered.
+- Wrapping device labels, larger-text button sizing, side/cutout insets, accessibility announcements and selected navigation state.
+- Explicit audio-worker start failure and calibration/unmute state guards.
+- New selector regression suite; existing audio suites rerun. Signed upgrade APK uses version code 6.
+- Hardware and rendered UI validation remain open; this is a beta, not a production certification.
+
 ## 0.4.1 beta — 2 October 2026
 
 - Support on Ko-fi button in About: https://ko-fi.com/jerrychiengct.
