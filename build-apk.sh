@@ -12,7 +12,7 @@ mapfile -t TASK_RES < <(find "$TASK_BUILD/res" -name '*.flat' -print)
 sed 's/<manifest xmlns:/<manifest package="com.jerry.micbridge" xmlns:/' app/src/main/AndroidManifest.xml > "$TASK_BUILD/AndroidManifest.xml"
 "$MICBRIDGE_TOOLS/aapt2" link -o "$TASK_BUILD/base.apk" -I "$MICBRIDGE_PLATFORM/android.jar" \
     --manifest "$TASK_BUILD/AndroidManifest.xml" --java "$TASK_BUILD/generated" \
-    --min-sdk-version 26 --target-sdk-version 35 --version-code 6 --version-name 0.4.2 \
+    --min-sdk-version 26 --target-sdk-version 35 --version-code 7 --version-name 0.5.0 \
     "${TASK_RES[@]}"
 mapfile -t TASK_JAVA < <(find app/src/main/java "$TASK_BUILD/generated" -name '*.java' -print)
 if command -v javac >/dev/null; then
@@ -33,6 +33,6 @@ if [[ ! -f "$TASK_BUILD/test-signing.jks" ]]; then
 fi
 mkdir -p dist
 "$MICBRIDGE_TOOLS/apksigner" sign --ks "$TASK_BUILD/test-signing.jks" --ks-pass pass:android \
-    --key-pass pass:android --out dist/MicBridge-0.4.2-beta.apk "$TASK_BUILD/aligned.apk"
-"$MICBRIDGE_TOOLS/apksigner" verify --verbose dist/MicBridge-0.4.2-beta.apk
-echo 'Built dist/MicBridge-0.4.2-beta.apk'
+    --key-pass pass:android --out dist/MicBridge-0.5.0-beta.apk "$TASK_BUILD/aligned.apk"
+"$MICBRIDGE_TOOLS/apksigner" verify --verbose dist/MicBridge-0.5.0-beta.apk
+echo 'Built dist/MicBridge-0.5.0-beta.apk'

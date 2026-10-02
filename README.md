@@ -1,9 +1,9 @@
 <p align="center">
-  <img src="docs/assets/micbridge-banner.png" alt="MicBridge — Live voice, clearly connected. Android 8+, 0.4.2 beta, on-device audio processing." width="100%" />
+  <img src="docs/assets/micbridge-banner.png" alt="MicBridge — Live voice, clearly connected. Android 8+, 0.5.0 beta, on-device audio processing." width="100%" />
 </p>
 
 <p align="center">
-  <a href="dist/MicBridge-0.4.2-beta.apk"><strong>Download beta APK</strong></a> ·
+  <a href="dist/MicBridge-0.5.0-beta.apk"><strong>Download beta APK</strong></a> ·
   <a href="docs/INSTALLATION.md">Get started</a> ·
   <a href="VOICE_PRESETS.md">Voice presets</a> ·
   <a href="CONTRIBUTING.md">Collaborate</a> ·
@@ -18,7 +18,7 @@ Made for **lectures, presentations and voice experiments** by **Jerry Chieng Chi
 
 ## Download and start
 
-**[Download MicBridge 0.4.2 beta](dist/MicBridge-0.4.2-beta.apk)** · Android 8.0 or newer · 2 October 2026
+**[Download MicBridge 0.5.0 beta](dist/MicBridge-0.5.0-beta.apk)** · Android 8.0 or newer · 2 October 2026
 
 Open the APK link, then choose **Download raw file** on GitHub. This repository is private: you need access and a signed-in GitHub account. This is an installable beta APK; there is no Play Store listing.
 
@@ -42,6 +42,14 @@ Keep MicBridge visible during playback. [Full installation guide and troubleshoo
 | Latency controls | Approximately 5 ms processing blocks in Fast mode, smaller requested buffers and underrun recovery |
 | Live monitoring | Input-level history, clipping indication, actual-route checks, persistent Mute and Stop controls |
 | Local processing | No microphone recordings, cloud processing, advertising or analytics |
+
+## Refined interface in 0.5.0
+
+A quieter charcoal and mint palette, large page titles, soft grouped cards and original outline icons give the native Android app an iOS-inspired visual style. Studio offers four quick presets, the full 16-preset collection and expandable creative controls. Device labels wrap, controls scale with text, and each tab remembers its scroll position.
+
+![MicBridge 0.5.0 design reference](docs/assets/ui-design-0.5.0.png)
+
+*Design reference, not an Android screenshot. Actual layout and system controls vary by device and font settings.* [Design notes](docs/DESIGN.md)
 
 ## Inside the app
 
@@ -72,7 +80,7 @@ Fast mode requests smaller app buffers; Android can adjust their size. **5 ms is
 
 Processing can improve levels and clarity, but cannot restore missing detail, repair transmitter clipping or prevent acoustic feedback. Keep the microphone away from the speaker. Hands-free Bluetooth microphones and phone earpieces are excluded from this media-audio engine. Built-in, USB and wired microphones remain available; unsupported combinations stay muted and stop with an error.
 
-## Device-selection cleanup in 0.4.2
+## Device-selection cleanup retained from 0.4.2
 
 The input and output selectors now use one Android device snapshot, remove repeated IDs, preserve choices by identity and recheck availability before starting. Disconnecting a selected device clears that choice instead of selecting a replacement. Distinct same-name ports are numbered; Bluetooth media and LE Audio profiles remain separately labelled. Only supported route categories appear. Long labels wrap and the main controls adapt to larger text.
 
@@ -80,7 +88,7 @@ The input and output selectors now use one Android device snapshot, remove repea
 
 | Check | Current status |
 | --- | --- |
-| Android SDK 35 compilation / APK signature | Verified for 0.4.2 |
+| Android SDK 35 compilation / APK signature | Verified for 0.5.0 |
 | Digital audio and format-negotiation tests | Passed; scope documented in [Testing](docs/TESTING.md) |
 | Upgrade signing | Same test certificate as earlier supplied betas |
 | Physical microphone / speaker combinations | Awaiting documented hardware test results |

@@ -2,9 +2,9 @@
 
 [← Project overview](../README.md)
 
-## Verified for beta 0.4.2
+## Verified for beta 0.5.0
 
-The APK was compiled against Android SDK 35, converted to DEX and verified with Android APK signature tools. Version code 6 and the signing certificate match the intended upgrade path from earlier supplied betas.
+The APK was compiled against Android SDK 35, converted to DEX and verified with Android APK signature tools. Version code 7 and the signing certificate match the intended upgrade path from earlier supplied betas.
 
 The standalone Java suites passed:
 
@@ -28,6 +28,10 @@ This patch adds the creator-provided Ko-fi link to About and the repository supp
 ## 0.4.2 routing and interface review
 
 The selector tests and both existing audio suites passed. APK compilation, manifest version/permissions, alignment and signature checks passed. The supplied APK uses the earlier beta certificate. Source review covered selector event handling, fresh start preflight, hotplug handling, supported media-route categories, permission loss, worker start rejection and calibration/unmute guards. UI changes were reviewed in source only; no rendered UI or Android runtime routing test is claimed.
+
+## 0.5.0 interface revision
+
+The native UI compiles against SDK 35. The existing selector and digital audio regression suites were rerun. The APK upgrade version, alignment and signatures were checked. Source review covered the featured-preset picker, null-safe featured buttons, expandable creative controls, preset restoration, dropdown affordances, calibration state and per-tab scrolling. The SVG design reference was rendered and visually reviewed; it is not a rendered Android UI or device screenshot.
 
 ## Physical validation still needed
 

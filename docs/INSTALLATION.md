@@ -4,9 +4,9 @@
 
 ## Download
 
-Download [MicBridge 0.4.2 beta](../dist/MicBridge-0.4.2-beta.apk), open the GitHub file page and choose **Download raw file**. Sign in with an account that has access to this private repository. Android 8.0+ is required. The APK is a test build, not a Play Store release.
+Download [MicBridge 0.5.0 beta](../dist/MicBridge-0.5.0-beta.apk), open the GitHub file page and choose **Download raw file**. Sign in with an account that has access to this private repository. Android 8.0+ is required. The APK is a test build, not a Play Store release.
 
-Open the downloaded APK on your phone. If Android asks, allow installation from the app you used to open the file. The supplied 0.4.2 APK uses the same test certificate as previous supplied betas and version code 6. An independently built APK may use a different key and require uninstalling the earlier build.
+Open the downloaded APK on your phone. If Android asks, allow installation from the app you used to open the file. The supplied 0.5.0 APK uses the same test certificate as previous supplied betas and version code 7. An independently built APK may use a different key and require uninstalling the earlier build.
 
 ## First session
 
@@ -39,24 +39,24 @@ Phone volume buttons adjust media volume. The app keeps the display awake while 
 
 ## Verify the downloaded APK
 
-SHA-256 for the supplied 0.4.2 beta:
+SHA-256 for the supplied 0.5.0 beta:
 
 ```text
-3b0686ce4be8c1bd9104865909a5380b25f5acbbde90b8a06393c46fd3fb6d54
+ac4c877609b926008af3786dde7432ab0a9a1504f96b0ee9a308950bf0e903ff
 ```
 
 On Windows PowerShell:
 
 ```powershell
-Get-FileHash .\MicBridge-0.4.2-beta.apk -Algorithm SHA256
+Get-FileHash .\MicBridge-0.5.0-beta.apk -Algorithm SHA256
 ```
 
 On Linux:
 
 ```bash
-sha256sum MicBridge-0.4.2-beta.apk
+sha256sum MicBridge-0.5.0-beta.apk
 ```
 
-## Device selection in 0.4.2
+## Device selection in 0.5.0
 
 Choose both devices explicitly. Refresh preserves choices by Android device ID, not row position. A disconnected device resets its selector to the prompt; select a replacement yourself. Same-name ports are numbered because identical product names do not prove that two routes are the same hardware. Bluetooth media and LE Audio profiles are different routes. Hands-free, earpiece and virtual system routes are filtered from this app.

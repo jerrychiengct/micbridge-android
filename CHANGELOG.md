@@ -1,5 +1,16 @@
 # Changelog
 
+## 0.5.0 beta — 2 October 2026
+
+- Refined native Android interface with neutral grouped surfaces, charcoal primary actions, mint accents and clearer type hierarchy.
+- Original vector outline navigation and action icons, press feedback and inset device selectors with dropdown affordances.
+- Compact featured presets plus the complete 16-preset collection in a picker.
+- Separate sound, equaliser, expandable creative and voice-care cards; creative controls reveal for relevant presets.
+- Less crowded Live page with detailed routing/latency explanations available on demand.
+- Real session-state badge, clearer calibration state and per-tab scroll restoration.
+- Accessible slider value labels and text-sized controls.
+- Signed beta upgrade APK, version code 7. Design references are clearly labelled; physical UI and audio validation remain required.
+
 ## 0.4.2 beta — 2 October 2026
 
 - One snapshot for input/output discovery, repeated-ID removal and stable device-ID selection.

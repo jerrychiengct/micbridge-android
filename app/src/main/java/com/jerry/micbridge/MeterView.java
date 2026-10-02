@@ -22,7 +22,7 @@ public final class MeterView extends View {
             float db=history[i]>0?(float)(20*Math.log10(history[i])):-60;
             float normal=Math.max(0,Math.min(1,(db+60)/60));
             float h=Math.max(4,normal*(height-10));
-            paint.setColor(history[i]>0.98f?Color.rgb(252,136,116):Color.rgb(98,220,193));
+            paint.setColor(history[i]>0.98f?Color.rgb(252,136,116):Color.rgb(156,221,201));
             paint.setAlpha(75+(int)(180*i/(float)history.length));
             rect.set(i*step+step*0.2f,(height-h)/2,i*step+step*0.8f,(height+h)/2);
             canvas.drawRoundRect(rect,step/3,step/3,paint);

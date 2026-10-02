@@ -1,13 +1,15 @@
 # Release readiness
 
-## 0.4.2 beta: completed in this environment
+## 0.5.0 beta: completed in this environment
 
 - [x] Reviewed selector discovery, identity, hotplug and pre-start availability handling.
 - [x] Passed selector regressions and the two existing digital audio suites.
-- [x] Compiled the Android SDK 35 APK; checked application ID, version code 6, Android 8+ minimum and permissions.
+- [x] Compiled the Android SDK 35 APK; checked application ID, version code 7, Android 8+ minimum and permissions.
 - [x] Verified APK alignment and v2/v3 signatures using the earlier beta certificate.
 - [x] Preserved creator credit, GitHub, collaboration email and Ko-fi support.
 - [x] Updated install instructions, checksum and compatibility limits.
+
+- [x] Reviewed native UI source and the labelled design reference; built the revised interface.
 
 ## Required before a production release
 
