@@ -4,7 +4,7 @@
 
 ## Download
 
-Download [MicBridge 0.5.0 beta](../dist/MicBridge-0.5.0-beta.apk), open the GitHub file page and choose **Download raw file**. Sign in with an account that has access to this private repository. Android 8.0+ is required. The APK is a test build, not a Play Store release.
+Download [MicBridge 0.5.0 beta](../dist/MicBridge-0.5.0-beta.apk), open the GitHub file page and choose **Download raw file**. The repository is public; a GitHub account is not required to download the APK. Android 8.0+ is required. The APK is a test build, not a Play Store release.
 
 Open the downloaded APK on your phone. If Android asks, allow installation from the app you used to open the file. The supplied 0.5.0 APK uses the same test certificate as previous supplied betas and version code 7. An independently built APK may use a different key and require uninstalling the earlier build.
 

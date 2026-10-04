@@ -20,7 +20,7 @@ Made for **lectures, presentations and voice experiments** by **Jerry Chieng Chi
 
 **[Download MicBridge 0.5.0 beta](dist/MicBridge-0.5.0-beta.apk)** · Android 8.0 or newer · 2 October 2026
 
-Open the APK link, then choose **Download raw file** on GitHub. This repository is private: you need access and a signed-in GitHub account. This is an installable beta APK; there is no Play Store listing.
+Open the APK link, then choose **Download raw file** on GitHub. This repository is public; anyone can browse the source and download the beta APK. This is an installable beta APK; there is no Play Store listing.
 
 1. Install the APK and allow **Microphone** and **Nearby devices** permissions when requested.
 2. Connect your microphone, or use **Phone microphone**. Pair your speaker in Android settings and enable **Media audio**.
@@ -102,9 +102,9 @@ The input and output selectors now use one Android device snapshot, remove repea
 Created by **[Jerry Chieng Chin Tung](https://github.com/jerrychiengct)**. Android developers, audio engineers, designers and beta testers are welcome.
 
 - **Collaborate:** read [Contributing](CONTRIBUTING.md), then share an idea, improvement or hardware test report.
-- **Report a problem:** use the repository's [issue forms](https://github.com/jerrychiengct/micbridge-android/issues/new/choose) if you have access.
+- **Report a problem:** use the repository's [issue forms](https://github.com/jerrychiengct/micbridge-android/issues/new/choose) to report a bug or share a hardware test.
 - **Support on Ko-fi:** [ko-fi.com/jerrychiengct](https://ko-fi.com/jerrychiengct). Support is voluntary and opens an external service.
 - **Donate or contact Jerry:** email **[jerrychiengchintung@gmail.com](mailto:jerrychiengchintung@gmail.com?subject=MicBridge%20project%20support)** personally. Donations are voluntary; MicBridge does not collect payments.
-- **Follow other projects:** visit [Jerry's public GitHub profile](https://github.com/jerrychiengct). Repository access is still required for private project links.
+- **Follow other projects:** visit [Jerry's public GitHub profile](https://github.com/jerrychiengct). MicBridge is a public beta project.
 
 [Support details](SUPPORT.md) · [Privacy](PRIVACY.md)
