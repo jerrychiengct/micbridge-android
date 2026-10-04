@@ -7,6 +7,8 @@
 
 ## Report a problem
 
+**The public beta is open to everyone.** Try MicBridge with your Android-compatible microphone and speaker, regardless of brand, then email **[jerrychiengchintung@gmail.com](mailto:jerrychiengchintung@gmail.com?subject=MicBridge%20beta%20feedback%20and%20requests)** personally. Share your experience, successful setups, sound quality, delay, problems and feature requests. No GitHub account is needed to download the APK or send feedback. About → **Email feedback or a request** opens a template in your email app for you to review and send.
+
 Read [Installation and troubleshooting](docs/INSTALLATION.md). Choose a bug or hardware-report form from [New issue](https://github.com/jerrychiengct/micbridge-android/issues/new/choose). You can also email Jerry with the app version, phone / Android version, selected microphone / speaker and steps to reproduce.
 
 Do not send personal audio recordings or sensitive information unless separately discussed and agreed. Screenshots of the app are helpful when identifying details and notifications are removed.

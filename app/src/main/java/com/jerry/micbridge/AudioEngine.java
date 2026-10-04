@@ -14,6 +14,7 @@ public final class AudioEngine {
     }
     private final Handler main = new Handler(Looper.getMainLooper());
     private final Listener listener;
+    private final int nativeRate,nativeBurst;
     private final Object resources = new Object();
     private volatile boolean running;
     private volatile boolean muted = true;
@@ -28,7 +29,15 @@ public final class AudioEngine {
     private AudioTrack player;
     private Thread thread;
 
-    public AudioEngine(Listener listener) { this.listener = listener; }
+    public AudioEngine(Listener listener, AudioManager manager) {
+        this.listener = listener;
+        nativeRate=property(manager,AudioManager.PROPERTY_OUTPUT_SAMPLE_RATE);
+        nativeBurst=property(manager,AudioManager.PROPERTY_OUTPUT_FRAMES_PER_BUFFER);
+    }
+    private static int property(AudioManager manager,String key){
+        try{return Integer.parseInt(manager.getProperty(key));}catch(RuntimeException ignored){return 0;}
+    }
+    private int blockFrames(int rate){return AudioRoutePlan.blockFrames(rate,preferFast,rate==nativeRate?nativeBurst:0);}
     public boolean isRunning() { return running; }
     public void setMuted(boolean value) { muted = value; }
     public void setGain(float value) { gain = Math.max(0.1f, Math.min(3f, value)); }
@@ -68,7 +77,7 @@ public final class AudioEngine {
                     .setAudioSource(MediaRecorder.AudioSource.VOICE_RECOGNITION)
                     .setAudioFormat(new AudioFormat.Builder().setSampleRate(rate)
                         .setChannelMask(inputMask).setEncoding(AudioFormat.ENCODING_PCM_16BIT).build())
-                    .setBufferSizeInBytes(Math.max(inMin*(preferFast?1:2), AudioRoutePlan.blockFrames(rate,preferFast)*channels*2*2)).build();
+                    .setBufferSizeInBytes(Math.max(inMin*(preferFast?1:2), blockFrames(rate)*channels*2*2)).build();
                 player = new AudioTrack.Builder()
                     .setAudioAttributes(new AudioAttributes.Builder().setUsage(AudioAttributes.USAGE_MEDIA)
                         .setContentType(AudioAttributes.CONTENT_TYPE_SPEECH).build())
@@ -76,12 +85,15 @@ public final class AudioEngine {
                         .setChannelMask(AudioFormat.CHANNEL_OUT_STEREO).setEncoding(AudioFormat.ENCODING_PCM_16BIT).build())
                     .setTransferMode(AudioTrack.MODE_STREAM)
                     .setPerformanceMode(AudioTrack.PERFORMANCE_MODE_LOW_LATENCY)
-                    .setBufferSizeInBytes(Math.max(outMin, rate / 25 * 4)).build();
+                    .setBufferSizeInBytes(Math.max(outMin, rate * 80 / 1000 * 4)).build();
                 if (recorder.getState() != AudioRecord.STATE_INITIALIZED || player.getState() != AudioTrack.STATE_INITIALIZED)
                     throw new IllegalStateException("Audio device could not initialise");
                 if (!recorder.setPreferredDevice(input) || !player.setPreferredDevice(output))
                     throw new IllegalStateException("Selected device is no longer available");
-                player.setBufferSizeInFrames(AudioRoutePlan.bufferFrames(rate,preferFast));
+                int requested=preferFast?blockFrames(rate)*2:AudioRoutePlan.bufferFrames(rate,false);
+                int effective=player.setBufferSizeInFrames(requested);
+                if(effective<0)throw new IllegalStateException("Speaker buffer configuration unavailable");
+                if(Build.VERSION.SDK_INT>=31)player.setStartThresholdInFrames(Math.max(1,effective));
             } catch (RuntimeException e) { releaseLocked(); throw e; }
         }
     }
@@ -92,7 +104,7 @@ public final class AudioEngine {
             int rate=0,channels=1;RuntimeException last=null;
             int preferredChannels=1;int[] advertised=input.getChannelCounts();boolean mono=false,stereo=false;
             for(int c:advertised){mono|=c==1;stereo|=c==2;}if(stereo&&!mono)preferredChannels=2;
-            outer:for(int candidate:AudioRoutePlan.rates(input.getSampleRates(),output.getSampleRates())) {
+            outer:for(int candidate:AudioRoutePlan.rates(input.getSampleRates(),output.getSampleRates(),nativeRate)) {
                 for(int attempt=0;attempt<2;attempt++) {
                     if(!running)return;int count=attempt==0?preferredChannels:3-preferredChannels;
                     try{open(input,output,candidate,count);rate=candidate;channels=count;break outer;}
@@ -106,18 +118,35 @@ public final class AudioEngine {
                 recorder.startRecording();
                 player.play();
             }
-            int block=AudioRoutePlan.blockFrames(rate,preferFast);
+            int block=blockFrames(rate);
             short[] capture=new short[block*channels],monoCapture=new short[block],playback=new short[block*2];
+            int captureBudget=Math.max(rate*(preferFast?20:40)/1000,Math.min(rate/5,recorder.getBufferSizeInFrames()));
+            LiveCaptureQueue pending=new LiveCaptureQueue(Math.max(block,captureBudget),Math.max(1,rate*2/1000));
+            int drainLimit=Math.max(2,Math.min(64,recorder.getBufferSizeInFrames()/block+2));
             SignalProcessor dsp = new SignalProcessor(rate);
             boolean verified = false;
             long deadline = SystemClock.elapsedRealtime() + 3000;
             long lastMeter=0,lastHealth=SystemClock.elapsedRealtime();int lastUnderruns=player.getUnderrunCount();
-            boolean calibrating=false;long calibrationFrames=0;double calibrationPower=0;
+            OutputBufferTuner tuner=new OutputBufferTuner(player.getBufferSizeInFrames(),block,player.getBufferCapacityInFrames(),lastHealth);
+            boolean healthPrimed=false;
+            boolean calibrating=false;long calibrationFrames=0;double calibrationPower=0,calibrationSum=0;
             while (running) {
-                int samples = recorder.read(capture, 0, capture.length, AudioRecord.READ_BLOCKING);
-                if (!running) break;
-                if(samples<=0)throw new IllegalStateException("Microphone interrupted ("+samples+")");
-                int count=AudioRoutePlan.downmix(capture,samples,channels,monoCapture);
+                if(pending.size()==0){
+                    int samples=recorder.read(capture,0,capture.length,AudioRecord.READ_BLOCKING);
+                    if(!running)break;
+                    if(samples<=0)throw new IllegalStateException("Microphone interrupted ("+samples+")");
+                    pending.offer(monoCapture,AudioRoutePlan.downmix(capture,samples,channels,monoCapture));
+                }
+                // Speaker writes can stall. Drain available capture without waiting and keep only
+                // a small live budget, rather than replaying an old input backlog indefinitely.
+                for(int n=0;running&&n<drainLimit;n++){
+                    int available=recorder.read(capture,0,capture.length,AudioRecord.READ_NON_BLOCKING);
+                    if(available==0)break;
+                    if(available<0){if(!running)break;throw new IllegalStateException("Microphone interrupted ("+available+")");}
+                    pending.offer(monoCapture,AudioRoutePlan.downmix(capture,available,channels,monoCapture));
+                }
+                if(!running)break;
+                int count=pending.read(monoCapture,block);
                 AudioDeviceInfo actualIn = recorder.getRoutedDevice();
                 AudioDeviceInfo actualOut = player.getRoutedDevice();
                 boolean correct = actualIn != null && actualOut != null
@@ -130,10 +159,10 @@ public final class AudioEngine {
                 }
                 if (!verified && SystemClock.elapsedRealtime() > deadline)
                     throw new IllegalStateException("Selected audio route unavailable. Check microphone and media output, then retry.");
-                if(calibrationRequested&&verified){calibrationRequested=false;calibrating=true;calibrationFrames=0;calibrationPower=0;}
+                if(calibrationRequested&&verified){calibrationRequested=false;calibrating=true;calibrationFrames=0;calibrationPower=0;calibrationSum=0;}
                 if(calibrating){
-                    for(int n=0;n<count;n++){double value=monoCapture[n]/32768.0;calibrationPower+=value*value;}calibrationFrames+=count;
-                    if(calibrationFrames>=rate*3L/2){float noise=(float)Math.sqrt(calibrationPower/calibrationFrames);dsp.setNoiseFloor(noise);calibrating=false;final float measured=noise;main.post(()->{if(running)listener.onCalibration(measured);});}
+                    for(int n=0;n<count;n++){double value=monoCapture[n]/32768.0;calibrationPower+=value*value;calibrationSum+=value;}calibrationFrames+=count;
+                    if(calibrationFrames>=rate*3L/2){double mean=calibrationSum/calibrationFrames;float noise=(float)Math.sqrt(Math.max(0,calibrationPower/calibrationFrames-mean*mean));dsp.setNoiseFloor(noise);calibrating=false;final float measured=noise;main.post(()->{if(running)listener.onCalibration(measured);});}
                 }
                 float peak=dsp.process(monoCapture,count,playback,gain,muted||!verified||calibrating,effects);
                 int offset = 0;
@@ -145,10 +174,15 @@ public final class AudioEngine {
                 long now = SystemClock.elapsedRealtime();
                 if(now-lastHealth>=1000){
                     lastHealth=now;int underruns=player.getUnderrunCount();
-                    if(preferFast&&underruns>lastUnderruns)player.setBufferSizeInFrames(AudioRoutePlan.growBuffer(player.getBufferSizeInFrames(),block,player.getBufferCapacityInFrames()));
+                    if(preferFast&&healthPrimed){
+                        int current=player.getBufferSizeInFrames(),next=tuner.update(current,underruns>lastUnderruns,now);
+                        if(next!=current)player.setBufferSizeInFrames(next);
+                    }
+                    healthPrimed=true;
                     lastUnderruns=underruns;
-                    String health="Processing blocks: "+(preferFast?5:10)+" ms • app output buffer: "+Math.round(player.getBufferSizeInFrames()*1000f/rate)+" ms\n"+
-                        "Output underruns: "+underruns+" • Android fast path: "+(player.getPerformanceMode()==AudioTrack.PERFORMANCE_MODE_LOW_LATENCY?"active":"unavailable")+"\nBluetooth and hardware delay are additional; this is not total measured latency.";
+                    String health="Processing blocks: "+Math.round(block*1000f/rate)+" ms • app output buffer: "+Math.round(player.getBufferSizeInFrames()*1000f/rate)+" ms\n"+
+                        "Capture backlog trimmed: "+Math.round(pending.discardedFrames()*1000.0/rate)+" ms total • output underruns: "+underruns+"\n"+
+                        "Android fast path: "+(player.getPerformanceMode()==AudioTrack.PERFORMANCE_MODE_LOW_LATENCY?"active":"unavailable")+" • capture buffer: "+Math.round(recorder.getBufferSizeInFrames()*1000f/rate)+" ms\nBluetooth and hardware delay are additional; these are not total measured latency.";
                     main.post(()->{if(running)listener.onAudioHealth(health);});
                 }
                 if (now - lastMeter >= 100) {

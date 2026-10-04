@@ -4,9 +4,9 @@
 
 ## Download
 
-Download [MicBridge 0.5.0 beta](../dist/MicBridge-0.5.0-beta.apk), open the GitHub file page and choose **Download raw file**. The repository is public; a GitHub account is not required to download the APK. Android 8.0+ is required. The APK is a test build, not a Play Store release.
+Download [MicBridge 0.5.1 beta](../dist/MicBridge-0.5.1-beta.apk), open the GitHub file page and choose **Download raw file**. The repository is public; a GitHub account is not required to download the APK. Android 8.0+ is required. The APK is a test build, not a Play Store release.
 
-Open the downloaded APK on your phone. If Android asks, allow installation from the app you used to open the file. The supplied 0.5.0 APK uses the same test certificate as previous supplied betas and version code 7. An independently built APK may use a different key and require uninstalling the earlier build.
+Open the downloaded APK on your phone. If Android asks, allow installation from the app you used to open the file. The supplied 0.5.1 APK uses the same test certificate as previous supplied betas and version code 8. An independently built APK may use a different key and require uninstalling the earlier build.
 
 ## First session
 
@@ -29,8 +29,8 @@ Phone volume buttons adjust media volume. The app keeps the display awake while 
 | Microphone absent | Reconnect it, check the adapter supports microphone input, grant permissions and refresh. Confirm Android recognises it in another audio app. |
 | Speaker absent | Pair in Android settings, enable Media audio, stop other media and refresh. BLE control alone is not LE Audio playback. |
 | Route unavailable | Recheck both selections. Use a built-in, USB or wired microphone; hands-free Bluetooth input is excluded. Android must report the selected media output as the actual route. |
-| Delay while speaking | Use Lecture / Studio Speech with pitch and echo off. Try Fast mode. Compare with a wired or USB output. Bluetooth buffering cannot be eliminated here. |
-| Crackles or interruptions | Stop the session, turn **Prefer shorter latency buffers** off, then restart. Check diagnostic underruns and test again. |
+| Delay while speaking | Use Lecture / Studio Speech with pitch and echo off. Try **Low latency mode**. Compare with a wired or USB output. Bluetooth buffering cannot be eliminated here. |
+| Crackles or interruptions | Stop the session, turn **Low latency mode** off, then restart. Check diagnostic underruns and capture-backlog trimming and test again. Continuous trimming can skip syllables; report it. |
 | Harsh or muffled speech | Reduce de-essing / noise reduction if consonants soften. Adjust mid / treble gently; avoid extreme boosts. |
 | Input clipping | Reduce transmitter or microphone input level. Software cannot repair already-clipped input. |
 | Squeal / feedback | Mute or stop, lower physical speaker volume and increase microphone / speaker separation. |
@@ -39,24 +39,28 @@ Phone volume buttons adjust media volume. The app keeps the display awake while 
 
 ## Verify the downloaded APK
 
-SHA-256 for the supplied 0.5.0 beta:
+SHA-256 for the supplied 0.5.1 beta:
 
 ```text
-ac4c877609b926008af3786dde7432ab0a9a1504f96b0ee9a308950bf0e903ff
+531ce7c3b7dba40b638c57e326038068756eb08c08381d0524fc9989cdb654ea
 ```
 
 On Windows PowerShell:
 
 ```powershell
-Get-FileHash .\MicBridge-0.5.0-beta.apk -Algorithm SHA256
+Get-FileHash .\MicBridge-0.5.1-beta.apk -Algorithm SHA256
 ```
 
 On Linux:
 
 ```bash
-sha256sum MicBridge-0.5.0-beta.apk
+sha256sum MicBridge-0.5.1-beta.apk
 ```
 
-## Device selection in 0.5.0
+## Device selection in 0.5.1
 
 Choose both devices explicitly. Refresh preserves choices by Android device ID, not row position. A disconnected device resets its selector to the prompt; select a replacement yourself. Same-name ports are numbered because identical product names do not prove that two routes are the same hardware. Bluetooth media and LE Audio profiles are different routes. Hands-free, earpiece and virtual system routes are filtered from this app.
+
+## Share your experience
+
+Everyone is welcome to test their own Android-compatible microphone and speaker, across brands and prices. Email **[jerrychiengchintung@gmail.com](mailto:jerrychiengchintung@gmail.com?subject=MicBridge%20beta%20feedback%20and%20requests)** with your experience, issues and feature requests, or use About → **Email feedback or a request**. Include your setup, settings and Live diagnostics. [Testing guide](TESTING.md)

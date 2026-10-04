@@ -30,7 +30,7 @@ body:
     id: settings
     attributes:
       label: Settings and Live diagnostics
-      description: Include preset, gain, noise calibration, sample rate, mode, buffer and underruns.
+      description: Include preset, gain, noise calibration, sample rate, mode, buffer, underruns and capture backlog trimmed.
     validations:
       required: true
   - type: textarea

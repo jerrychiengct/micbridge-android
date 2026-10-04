@@ -1,5 +1,18 @@
 # Changelog
 
+## 0.5.1 beta — 4 October 2026
+
+- Public testing invitation for Android-compatible microphones and speakers across brands, including generic devices and wireless microphones with compatible USB receivers.
+- About feedback button prepares an email to jerrychiengchintung@gmail.com with hardware, audio-quality, latency and feature-request fields; public repository access wording corrected.
+- Shared native sample-rate preference and suitable native burst sizes in Fast mode, with fixed-format and common-rate fallbacks.
+- Bounded capture queue and nonblocking backlog drain after speaker stalls; retain recent speech, count discarded frames and ease recovery over 2 ms. Overload can skip audio and must be tested on hardware.
+- Output buffer capacity reserved for recovery; Fast mode grows on underruns and cautiously reduces after ten stable seconds, retaining a higher floor after a failed probe. Android 12+ start threshold follows the effective buffer.
+- Causal sample-based peak limiting with 80 ms release, independent of processing-block boundaries; a late peak no longer attenuates earlier speech in its block.
+- Sample-rate-aware noise expansion with 1 ms opening / 20 ms closing, DC-offset-aware noise calibration, and cached settled EQ coefficients.
+- Native block duration, input/output buffer sizes, underruns and cumulative backlog trimming exposed in Live diagnostics.
+- Four regression suites passed, including randomized queue overload, tuning hysteresis and limiter invariance at up to 192 kHz. SDK 35 build and signatures verified; version code 8, same supplied beta certificate.
+- End-to-end delay, acoustic quality, Android runtime routing and rendered UI still require physical-device testing. No universal-hardware or measured latency guarantee.
+
 ## 0.5.0 beta — 2 October 2026
 
 - Refined native Android interface with neutral grouped surfaces, charcoal primary actions, mint accents and clearer type hierarchy.

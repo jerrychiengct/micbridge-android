@@ -31,7 +31,7 @@ MICBRIDGE_TOOLS="$ANDROID_HOME/build-tools/35.0.0" \
 ./build-apk.sh
 ```
 
-Output: `dist/MicBridge-0.5.0-beta.apk`. If no JDK compiler is available, `MICBRIDGE_ECJ` can point to an Eclipse ECJ JAR. Keep the locally generated signing key for consistent updates. Signing keys, SDK paths and build directories are excluded from git.
+Output: `dist/MicBridge-0.5.1-beta.apk`. If no JDK compiler is available, `MICBRIDGE_ECJ` can point to an Eclipse ECJ JAR. Keep the locally generated signing key for consistent updates. Signing keys, SDK paths and build directories are excluded from git.
 
 ## Digital tests
 
@@ -47,7 +47,7 @@ Or use an installed ECJ JAR:
 MICBRIDGE_ECJ=/absolute/path/to/ecj.jar ./tests/run-tests.sh
 ```
 
-The script compiles only the platform-independent DSP / format-planning classes, runs both test suites and removes its temporary output. These tests do not require an Android device. They do not establish device compatibility or measure acoustic latency; see [Testing](TESTING.md).
+The script compiles only the platform-independent DSP / format-planning classes, runs all four test suites and removes its temporary output. These tests do not require an Android device. They do not establish device compatibility or measure acoustic latency; see [Testing](TESTING.md).
 
 ## Source map
 
@@ -57,7 +57,8 @@ The script compiles only the platform-independent DSP / format-planning classes,
 | `AudioEngine.java` | Capture / playback loop, route checks, buffers and calibration |
 | `SignalProcessor.java` | Streaming effects, mute state and output limiting |
 | `VoiceEnhancer.java` / `VoiceEqualizer.java` | Voice care and EQ |
-| `AudioRoutePlan.java` | Format negotiation, block / buffer arithmetic and stereo downmix |
+| `AudioRoutePlan.java` | Format negotiation, native burst planning and stereo downmix |
+| `LiveCaptureQueue.java` / `OutputBufferTuner.java` | Bounded capture recovery and stable output buffer tuning |
 | `VoicePresets.java` / `EffectSettings.java` | Original preset tunings and immutable settings |
 | `SpeakerCatalog.java` / `AppInfo.java` | Speaker examples and creator information |
 | `tests/` | Standalone Java verification |

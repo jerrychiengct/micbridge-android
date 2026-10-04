@@ -8,7 +8,8 @@ public final class SignalProcessor {
     private final VoiceEqualizer eq;
     private final VoiceEnhancer enhancer;
     private float speechEnvelope;
-    private final float[] pitchBuffer, echoBuffer, work=new float[2048];
+    private final float[] pitchBuffer, echoBuffer;
+    private final float limiterRelease;
     private int pitchWrite, echoWrite;
     private float limiter=1f, low, hpIn, hpOut;
     private double pitchPhase, robotPhase;
@@ -17,14 +18,14 @@ public final class SignalProcessor {
     public SignalProcessor() { this(48000); }
     public SignalProcessor(int rate) {
         if(rate<8000 || rate>192000) throw new IllegalArgumentException("Unsupported sample rate");
-        this.rate=rate; eq=new VoiceEqualizer(rate); enhancer=new VoiceEnhancer(rate); pitchBuffer=new float[rate/10]; echoBuffer=new float[rate];
+        this.rate=rate; eq=new VoiceEqualizer(rate); enhancer=new VoiceEnhancer(rate); pitchBuffer=new float[rate/10]; echoBuffer=new float[rate];limiterRelease=(float)Math.exp(-1.0/(rate*0.080));
     }
     public void setNoiseFloor(float rms){enhancer.setNoiseFloor(rms);}
     public float process(short[] input,int count,short[] output,float gain,boolean muted) {
         return process(input,count,output,gain,muted,EffectSettings.natural());
     }
     public float process(short[] input,int count,short[] output,float gain,boolean muted,EffectSettings fx) {
-        if(count<0 || count>input.length || count>work.length || output.length<count*2) throw new IllegalArgumentException("Invalid audio block");
+        if(count<0 || count>input.length || count>output.length/2) throw new IllegalArgumentException("Invalid audio block");
         if(fx==null) throw new IllegalArgumentException("Missing effect settings");
         gain=Float.isNaN(gain)?1f:Math.max(0.1f,Math.min(3f,gain));
         float rawPeak=0;
@@ -44,7 +45,6 @@ public final class SignalProcessor {
         float hpAlpha=(float)Math.exp(-2*Math.PI*90/rate);
         float bright=(float)Math.pow(10,fx.tone/20), warm=(float)Math.pow(10,-fx.tone/20);
         int echoDelay=Math.round(rate*fx.echoMillis/1000f);
-        float effectedPeak=0;
         for(int i=0;i<count;i++) {
             float x=input[i]/32768f;
             if(fx.enabled) {
@@ -77,12 +77,11 @@ public final class SignalProcessor {
                     x+=delayed*fx.echo; echoWrite=(echoWrite+1)%echoBuffer.length;
                 }
             }
-            work[i]=x*gain; effectedPeak=Math.max(effectedPeak,Math.abs(work[i]));
-        }
-        float target=effectedPeak>0.9f?0.9f/effectedPeak:1f;
-        limiter=target<limiter?target:Math.min(target,limiter+count/(float)rate);
-        for(int i=0;i<count;i++) {
-            int value=Math.round(work[i]*limiter*32768);
+            x*=gain;
+            float magnitude=Math.abs(x),target=magnitude>0.9f?0.9f/magnitude:1f;
+            // Causal peak control: a late peak must not attenuate earlier speech in the block.
+            limiter=target<limiter?target:limiterRelease*limiter+(1-limiterRelease)*target;
+            int value=Math.round(x*limiter*32768);
             short sample=(short)Math.max(-29490,Math.min(29490,value));
             output[i*2]=sample; output[i*2+1]=sample;
         }

@@ -7,6 +7,7 @@ final class VoiceEqualizer {
     private float b,m,t; private boolean configured;
     VoiceEqualizer(int rate){this.rate=rate;}
     void configure(float bassDb,float midDb,float trebleDb) {
+        if(configured&&b==bassDb&&m==midDb&&t==trebleDb)return;
         // Ease live slider changes over several blocks; no audio-thread allocation.
         b=configured?approach(b,bassDb):bassDb;m=configured?approach(m,midDb):midDb;t=configured?approach(t,trebleDb):trebleDb;
         bass.configure(rate,180,b,0);mid.configure(rate,1500,m,1);treble.configure(rate,Math.min(4000,rate*0.4),t,2);configured=true;

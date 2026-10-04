@@ -48,7 +48,7 @@ public final class MainActivity extends Activity implements AudioEngine.Listener
     @Override public void onCreate(Bundle saved) {
         super.onCreate(saved);
         audio=(AudioManager)getSystemService(AUDIO_SERVICE); prefs=getSharedPreferences("studio",MODE_PRIVATE);
-        engine=new AudioEngine(this); setVolumeControlStream(AudioManager.STREAM_MUSIC);
+        engine=new AudioEngine(this,audio); setVolumeControlStream(AudioManager.STREAM_MUSIC);
         buildUi(); restoreSettings(); audio.registerAudioDeviceCallback(devices,handler); ensurePermissions();
     }
     private int dp(int v) { return Math.round(v*getResources().getDisplayMetrics().density); }
@@ -125,7 +125,7 @@ public final class MainActivity extends Activity implements AudioEngine.Listener
         fast=toggle("Low latency mode");fast.setChecked(true);tuning.addView(fast);fast.setOnCheckedChangeListener((b,on)->engine.setPreferFast(on));
         gain=new Slider(tuning,"Microphone gain",290,90,p->String.format(Locale.UK,"%.1f×",0.1f+p/100f));gain.setOnChange(()->engine.setGain(0.1f+gain.value()/100f));
         audioHealth=text("Buffer diagnostics appear during a session.",12,SUB);tuning.addView(audioHealth);
-        Button latency=button("Understand latency",PAPER);latency.setTextSize(12);latency.setTextColor(TEAL);fullButton(tuning,latency);latency.setOnClickListener(v->details("Latency & sound quality","Low latency mode uses 5 ms processing blocks and requests a smaller output buffer. If audio crackles, stop and switch this off for 10 ms blocks. Bluetooth and hardware buffering remain additional. An app buffer value is not total measured latency. Pitch effects add a short processing delay."));
+        Button latency=button("Understand latency",PAPER);latency.setTextSize(12);latency.setTextColor(TEAL);fullButton(tuning,latency);latency.setOnClickListener(v->details("Latency & sound quality","Low latency mode uses a suitable native burst or approximately 5 ms blocks and requests a smaller output buffer. It trims stale capture after stalls and adapts output buffering to underruns. Trimming can skip audio during overload. If audio crackles or trimming keeps rising, stop and switch this off for 10 ms blocks. Bluetooth and hardware buffering remain additional. Diagnostics are not total measured latency. For speech, keep pitch and echo off."));
         LinearLayout quality=card(page);quality.addView(heading("Voice care",19));quality.addView(text("A quieter background. A clearer voice. Choose Lecture in Studio for gentle speech processing.",14,SUB));
         calibrate=button("Calibrate background noise",PALE);fullButton(quality,calibrate);enabled(calibrate,false);
         calibrationStatus=text("Start muted, then stay quiet for 1.5 seconds during calibration.",12,SUB);quality.addView(calibrationStatus);
@@ -190,20 +190,26 @@ public final class MainActivity extends Activity implements AudioEngine.Listener
         if(found==0)catalogCards.addView(text("No examples found. You can still connect an unlisted Bluetooth media speaker.",14,SUB));
     }
     private void buildAbout(LinearLayout page){
-        pageTitle(page,"About MicBridge","An independent voice studio. Made with care.");page.addView(text("Version 0.5.0 beta · Android 8+",12,SUB));
+        pageTitle(page,"About MicBridge","An independent voice studio. Made with care.");page.addView(text("Version 0.5.1 beta · Android 8+",12,SUB));
         LinearLayout creator=card(page);creator.addView(heading("Created by",16));creator.addView(heading(AppInfo.CREATOR,22));creator.addView(text("An independent project to make live speech amplification and creative voice tools more accessible. Built for lectures, presentations and everyday voice experiments.",14,SUB));
         LinearLayout support=card(page);support.addView(heading("Support the project",20));support.addView(text("Visit my GitHub to follow development. You can support the project on Ko-fi, or email me personally. Support is voluntary; Ko-fi opens in your browser.",14,SUB));
         Button kofi=button("Support on Ko-fi",TEAL);fullButton(support,kofi);kofi.setOnClickListener(v->openExternal(new Intent(Intent.ACTION_VIEW,Uri.parse(AppInfo.KOFI))));
         Button github=button("Visit my GitHub",TEAL);fullButton(support,github);github.setOnClickListener(v->openExternal(new Intent(Intent.ACTION_VIEW,Uri.parse(AppInfo.GITHUB))));
-        Button project=button("Project repository",PALE);fullButton(support,project);project.setOnClickListener(v->openExternal(new Intent(Intent.ACTION_VIEW,Uri.parse(AppInfo.REPOSITORY))));support.addView(text("The project repository may require access and a GitHub sign-in.",12,SUB));
+        Button project=button("Project repository",PALE);fullButton(support,project);project.setOnClickListener(v->openExternal(new Intent(Intent.ACTION_VIEW,Uri.parse(AppInfo.REPOSITORY))));support.addView(text("The repository is public. Browse the source and download the beta without signing in.",12,SUB));
         support.addView(text(AppInfo.EMAIL,14,TEAL));Button donate=button("Email about a donation",PALE);fullButton(support,donate);donate.setOnClickListener(v->emailCreator("MicBridge — project support"));
         LinearLayout collaborate=card(page);collaborate.addView(heading("Open for collaboration",20));collaborate.addView(text("Android developers, audio engineers, designers and beta testers are welcome. Share your ideas, hardware test results or a proposal by email.",14,SUB));Button contact=button("Discuss a collaboration",TEAL);fullButton(collaborate,contact);contact.setOnClickListener(v->emailCreator("MicBridge — collaboration enquiry"));
+        LinearLayout testing=card(page);testing.addView(heading("Help test MicBridge",20));testing.addView(text("Try your Android-compatible microphone and speaker, whatever the brand. Built-in, wired and USB microphones, including compatible wireless receivers, are welcome. Share your experience, delay, sound quality, bugs and feature requests with me.",14,SUB));testing.addView(text(AppInfo.EMAIL,14,TEAL));Button feedback=button("Email feedback or a request",TEAL);fullButton(testing,feedback);feedback.setOnClickListener(v->emailFeedback());
         LinearLayout privacy=card(page);privacy.addView(heading("Privacy and practical limits",18));privacy.addView(text("Processing stays on your phone. No recordings, cloud upload, advertising or analytics. The app remains on screen during a session and stops when you leave it. External links and email open another app and stop live audio. No donation is collected inside MicBridge.",13,SUB));privacy.addView(text("USB and wired mic compatibility depends on Android and the adapter. Bluetooth adds buffering. Voice care is best-effort processing, not studio restoration, feedback cancellation or a guarantee of identical sound across microphones.",12,SUB));
     }
     private void openExternal(Intent intent){try{startActivity(intent);}catch(ActivityNotFoundException error){Toast.makeText(this,"No app available to open this link",Toast.LENGTH_LONG).show();}}
     private void emailCreator(String subject){
         try{startActivity(new Intent(Intent.ACTION_SENDTO,Uri.parse("mailto:"+AppInfo.EMAIL+"?subject="+Uri.encode(subject))));}
         catch(ActivityNotFoundException error){android.content.ClipboardManager clipboard=(android.content.ClipboardManager)getSystemService(CLIPBOARD_SERVICE);clipboard.setPrimaryClip(ClipData.newPlainText("MicBridge creator email",AppInfo.EMAIL));Toast.makeText(this,"Email address copied: "+AppInfo.EMAIL,Toast.LENGTH_LONG).show();}
+    }
+    private void emailFeedback(){
+        String body="MicBridge 0.5.1 beta feedback\n\nPhone and Android version: \nMicrophone and adapter: \nSpeaker and connection type: \nFast or Balanced mode: \nPreset and gain: \nDelay and sound quality: \nSession length and stability: \nUnderruns / capture backlog trimmed: \nMy experience, bugs or feature requests: \n";
+        try{startActivity(new Intent(Intent.ACTION_SENDTO,Uri.parse("mailto:"+AppInfo.EMAIL+"?subject="+Uri.encode("MicBridge — beta feedback and requests")+"&body="+Uri.encode(body))));}
+        catch(ActivityNotFoundException error){emailCreator("MicBridge — beta feedback and requests");}
     }
     private void showPage(int index) {if(selectedPage>=0)pageScroll[selectedPage]=scroll.getScrollY();selectedPage=index;for(int i=0;i<4;i++){pages[i].setVisibility(i==index?View.VISIBLE:View.GONE);surface(tabs[i],PAPER,14);icon(tabs[i],i,i==index?TEAL:SUB,true);tabs[i].setTextColor(i==index?TEAL:SUB);tabs[i].setSelected(i==index);}scroll.post(()->{if(selectedPage==index)scroll.scrollTo(0,pageScroll[index]);});}
     private final class Slider {
