@@ -4,7 +4,7 @@ Thank you for helping improve live speech and creative voice tools. Android deve
 
 ## Start a conversation
 
-This is an independent private beta project by Jerry Chieng Chin Tung. If you have repository access, use the issue forms for bugs, ideas or hardware reports. Otherwise email **[jerrychiengchintung@gmail.com](mailto:jerrychiengchintung@gmail.com?subject=MicBridge%20collaboration)** with your proposed contribution. Repository access is not granted automatically.
+This is an independent public beta project by Jerry Chieng Chin Tung. Use the issue forms for bugs, ideas or hardware reports, or email **[jerrychiengchintung@gmail.com](mailto:jerrychiengchintung@gmail.com?subject=MicBridge%20collaboration)** with your proposed contribution.
 
 Describe the problem or user benefit, your proposed approach and the kind of help you can provide. Discuss large architectural changes before implementing them.
 

@@ -7,7 +7,7 @@
 
 ## Report a problem
 
-Read [Installation and troubleshooting](docs/INSTALLATION.md). If you have repository access, choose a bug or hardware-report form from [New issue](https://github.com/jerrychiengct/micbridge-android/issues/new/choose). Otherwise email Jerry with the app version, phone / Android version, selected microphone / speaker and steps to reproduce.
+Read [Installation and troubleshooting](docs/INSTALLATION.md). Choose a bug or hardware-report form from [New issue](https://github.com/jerrychiengct/micbridge-android/issues/new/choose). You can also email Jerry with the app version, phone / Android version, selected microphone / speaker and steps to reproduce.
 
 Do not send personal audio recordings or sensitive information unless separately discussed and agreed. Screenshots of the app are helpful when identifying details and notifications are removed.
 
@@ -21,4 +21,4 @@ You can also email Jerry personally with the subject **MicBridge — project sup
 
 Android development, audio processing, interface design, hardware testing and documentation contributions are welcome. Email with the subject **MicBridge — collaboration enquiry** and describe your idea or proposed role. See [Contributing](CONTRIBUTING.md) for the development workflow.
 
-The repository is private. Public visitors can follow the GitHub profile or contact the creator; private code, downloads and issues require repository access.
+The repository is public. Anyone can browse the source, download the beta APK and read issues. A GitHub account is needed to post issues or propose changes.
