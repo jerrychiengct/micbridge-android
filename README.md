@@ -13,23 +13,46 @@
 
 # MicBridge
 
-**Your voice, amplified. Your microphone. Your speaker.**
+**Your voice, amplified. Make more of the audio equipment you already have.**
 
-MicBridge turns your Android phone into a live speech and voice-effects tool. It is designed for microphones and speakers across brands: use the phone's built-in mic, an Android-compatible wired or USB microphone, or a wireless microphone with a compatible USB receiver. Send your voice to a connected Bluetooth speaker, wired or USB audio output, or the phone speaker.
+Need to lead a lesson, run a workshop or give a small presentation? MicBridge turns your Android phone and a compatible speaker into a live speech setup. Speak through your phone's built-in microphone or a compatible external mic, then send your voice to your selected audio output.
 
-No particular phone, microphone or speaker brand is required. Android must recognise and route the hardware; not every adapter or connection combination is supported. Hands-free Bluetooth microphone input is not supported by this media-audio engine.
+Start with **Lecture** for spoken delivery, adjust your sound to suit your voice, or explore **16 original presets** for creative voice effects. MicBridge brings microphone selection, speaker selection, voice controls and live monitoring together in one clean interface.
 
-Made for **lectures, presentations and voice experiments** by **Jerry Chieng Chin Tung**.
+**[Download the free Android beta](dist/MicBridge-0.5.1-beta.apk)** · Android 8.0+ · No app account required · Audio processed on your phone
 
-## Try the public beta — help make it better
+## Why try MicBridge?
 
-**Everyone is invited to download, try and test MicBridge with the hardware they already have.** Budget, generic and premium microphones and speakers are all welcome. This repository is public, and your experience will help improve compatibility, latency, speech quality and everyday usability.
+- **Use what you already own.** Start with your phone mic and a compatible speaker; add a wired or USB microphone when you need one. Compatible wireless microphones with USB receivers are welcome too.
+- **Make speaking your starting point.** Lecture and Studio Speech presets offer speech-focused tuning, with optional background-noise calibration and gentle level assistance.
+- **Choose how your voice sounds.** Adjust gain, bass, mid, treble and tone, or explore pitch, grit, robot and echo effects.
+- **Stay in control while speaking.** See the input level, choose both audio routes, and keep Mute and Stop within reach.
+- **Keep live audio local.** Processing works on device, without microphone recordings, cloud audio processing, advertising or analytics.
+- **Help shape an independent project.** Try the public beta, share your experience and suggest the features that would make it more useful.
 
-Email me personally at **[jerrychiengchintung@gmail.com](mailto:jerrychiengchintung@gmail.com?subject=MicBridge%20beta%20feedback%20and%20requests)** with your experiences, problems, ideas and feature requests. Working setups are just as useful as failed ones. You can also use **About → Email feedback or a request** in the app.
+## Who is it for?
 
-Please include your app version, phone and Android version, microphone/adapter, speaker and connection type, preset and latency mode. Tell me how the voice sounds, whether the delay is distracting, and how long you tested it. If possible, include the output underrun count and capture-backlog trimming shown on Live. [Full testing guide →](docs/TESTING.md)
+| Your situation | A useful starting point |
+| --- | --- |
+| Teaching a lesson or explaining to a small group | Phone mic or external mic, Lecture preset, compatible external speaker |
+| Running a workshop or giving a presentation | Studio Speech, gentle EQ adjustments, live level monitoring |
+| Practising delivery or experimenting with sound | Natural, Broadcast or Warm Narrator; compare settings on your own setup |
+| Making a voice-effects demonstration | Explore Vigilante, Cyber Pilot and other original presets |
+| Testing everyday audio equipment | Try generic or branded devices and report what works |
 
-Developers, audio engineers, designers and testers are welcome to collaborate. Support continued development through **[Ko-fi](https://ko-fi.com/jerrychiengct)**.
+MicBridge is **brand-independent**. No particular phone, microphone or speaker brand is required. It supports Android-recognised built-in, wired and USB inputs, with Bluetooth media, wired, USB and phone-speaker outputs. Compatibility depends on Android, the adapter and the selected route. Hands-free Bluetooth microphone input is not supported. Bluetooth delay varies by setup; wired or USB output is worth comparing for live speech.
+
+## Try it. Tell me what would make it better.
+
+**Everyone is invited to download and test MicBridge with their own compatible hardware.** Budget, generic and premium equipment are all welcome. Successful setups are just as valuable as bug reports.
+
+Email **[jerrychiengchintung@gmail.com](mailto:jerrychiengchintung@gmail.com?subject=MicBridge%20beta%20feedback%20and%20requests)** with your experience, sound quality, delay, problems and feature requests. You can also use **About → Email feedback or a request** in the app. Include the phone/Android version, microphone or adapter, speaker connection and app settings. [Testing guide →](docs/TESTING.md)
+
+Created by **Jerry Chieng Chin Tung**. Developers, audio engineers, designers and testers are welcome to collaborate. [Support development on Ko-fi](https://ko-fi.com/jerrychiengct).
+
+## For reviewers and content creators
+
+Want to show your audience a practical Android experiment? Demonstrate **phone mic → connected speaker**, then compare a speech preset and a creative voice effect. Use real audio, describe your actual setup and invite viewers to try the beta. [Media brief, demo outline and reusable copy →](docs/MEDIA_KIT.md)
 
 ## Download and start
 
