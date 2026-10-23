@@ -1,3 +1,9 @@
+# Latest preview validation — 0.6.0
+
+All five suites passed, including [Synthetic Overlord tests and limits](SYNTHETIC_OVERLORD.md). The preview APK is SDK 35 compiled, aligned and v2/v3 signature-verified, with application ID `com.jerry.micbridge.preview`, launcher `com.jerry.micbridge.MainActivity`, minimum API 26 and version code 9. Its certificate differs from the earlier beta, so it installs alongside that app. The preview signing key has been preserved privately; it is excluded from the repository.
+
+New tests cover 17-preset metadata, metallic control bounds, 47/89 Hz modulation sidebands, zero-blend/bypass unity, dry onset, block invariance, damped tail stability and mute clearing at 8–192 kHz. Hardware listening, installed UI, routing and acoustic latency tests remain required. Historical 0.5.1 results follow.
+
 # Testing and hardware reports
 
 [← Project overview](../README.md)

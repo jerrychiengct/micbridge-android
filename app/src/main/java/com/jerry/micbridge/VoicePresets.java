@@ -2,8 +2,8 @@ package com.jerry.micbridge;
 
 /** Original tunings based on standard voice-processing practices; no proprietary preset assets. */
 public final class VoicePresets {
-    public static final String[] TITLES={"Natural","Clear voice","Deep voice","Bright voice","Robot","Room echo","Lecture","Vigilante","Studio Speech","Broadcast","Warm Narrator","Crisp Presenter","Soft Spoken","Small Room","Cyber Pilot","Cinematic"};
-    public static final String[] HINTS={"Original voice","Speech clarity","Lower pitch","Higher pitch","Metallic texture","Spacious repeats","Clear, steady speech","Deep, gritty hero","Balanced dialogue","Radio presence","Warm storytelling","Clear consonants","Gentle level assist","Less boom & hiss","Sci-fi character","Deep trailer texture"};
+    public static final String[] TITLES={"Natural","Clear voice","Deep voice","Bright voice","Robot","Room echo","Lecture","Vigilante","Studio Speech","Broadcast","Warm Narrator","Crisp Presenter","Soft Spoken","Small Room","Cyber Pilot","Cinematic","Synthetic Overlord"};
+    public static final String[] HINTS={"Original voice","Speech clarity","Lower pitch","Higher pitch","Metallic texture","Spacious repeats","Clear, steady speech","Deep, gritty hero","Balanced dialogue","Radio presence","Warm storytelling","Clear consonants","Gentle level assist","Less boom & hiss","Sci-fi character","Deep trailer texture","Ultron-inspired metallic layers"};
     public static EffectSettings get(int index){
         switch(index){
             case 1:return voice(0,2,0,0,0,0,false,0,0,250,0.25f,0.25f,false);
@@ -21,6 +21,7 @@ public final class VoicePresets {
             case 13:return voice(0,0,-4,2,-2,0,true,0,0,250,0.55f,0.50f,false);
             case 14:return voice(-2,1,-2,2,1,0.15f,true,0.45f,0.12f,150,0.35f,0.30f,false);
             case 15:return voice(-3,-1,3,1,-1,0.20f,true,0,0.10f,200,0.35f,0.35f,false);
+            case 16:return new EffectSettings(true,true,-2,-1,1,2,1,0.18f,true,0.18f,0.05f,100,0.20f,0.20f,false,0.65f);
             default:return EffectSettings.natural();
         }
     }

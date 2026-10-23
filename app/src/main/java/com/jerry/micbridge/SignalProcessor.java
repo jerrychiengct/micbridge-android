@@ -7,6 +7,7 @@ public final class SignalProcessor {
     private final int rate;
     private final VoiceEqualizer eq;
     private final VoiceEnhancer enhancer;
+    private final MetallicVoice metallic;
     private float speechEnvelope;
     private final float[] pitchBuffer, echoBuffer;
     private final float limiterRelease;
@@ -18,7 +19,7 @@ public final class SignalProcessor {
     public SignalProcessor() { this(48000); }
     public SignalProcessor(int rate) {
         if(rate<8000 || rate>192000) throw new IllegalArgumentException("Unsupported sample rate");
-        this.rate=rate; eq=new VoiceEqualizer(rate); enhancer=new VoiceEnhancer(rate); pitchBuffer=new float[rate/10]; echoBuffer=new float[rate];limiterRelease=(float)Math.exp(-1.0/(rate*0.080));
+        this.rate=rate; eq=new VoiceEqualizer(rate); enhancer=new VoiceEnhancer(rate);metallic=new MetallicVoice(rate); pitchBuffer=new float[rate/10]; echoBuffer=new float[rate];limiterRelease=(float)Math.exp(-1.0/(rate*0.080));
     }
     public void setNoiseFloor(float rms){enhancer.setNoiseFloor(rms);}
     public float process(short[] input,int count,short[] output,float gain,boolean muted) {
@@ -36,6 +37,7 @@ public final class SignalProcessor {
         }
         wasMuted=false;
         if(previous.enabled!=fx.enabled || previous.clarity!=fx.clarity || previous.speech!=fx.speech || previous.autoLevel!=fx.autoLevel || (previous.noise>0)!=(fx.noise>0) || (previous.deEss>0)!=(fx.deEss>0) || previous.pitch!=fx.pitch || previous.echoMillis!=fx.echoMillis || (previous.echo>0 && fx.echo==0)) reset();
+        if(previous.metal>0&&fx.metal==0)metallic.reset();
         previous=fx;
         if(fx.enabled) eq.configure(fx.bass,fx.mid,fx.treble);
         float attack=(float)Math.exp(-1.0/(rate*0.010)), release=(float)Math.exp(-1.0/(rate*0.180));
@@ -64,6 +66,7 @@ public final class SignalProcessor {
                     float textured=(float)Math.tanh(x*(1+fx.growl*10));
                     x=x*(1-fx.growl)+textured*fx.growl;
                 }
+                if(fx.metal>0)x=metallic.process(x,fx.metal);
                 if(fx.speech) {
                     float magnitude=Math.abs(x), coefficient=magnitude>speechEnvelope?attack:release;
                     speechEnvelope=coefficient*speechEnvelope+(1-coefficient)*magnitude;
@@ -93,7 +96,7 @@ public final class SignalProcessor {
         return (float)(pitchBuffer[index]*(1-fraction)+pitchBuffer[(index+1)%pitchBuffer.length]*fraction);
     }
     private void reset() {
-        Arrays.fill(pitchBuffer,0); Arrays.fill(echoBuffer,0); eq.reset(); enhancer.reset(); speechEnvelope=0;
+        Arrays.fill(pitchBuffer,0); Arrays.fill(echoBuffer,0); eq.reset(); enhancer.reset();metallic.reset(); speechEnvelope=0;
         pitchWrite=echoWrite=0; pitchPhase=robotPhase=0; low=hpIn=hpOut=0; limiter=1;
     }
 }

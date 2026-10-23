@@ -2,7 +2,15 @@
 
 [← Project overview](../README.md)
 
-## Download
+## New Synthetic Overlord preview
+
+Download [MicBridge Preview 0.6.0](../dist/MicBridge-0.6.0-preview.apk), choose **Download raw file** and open the APK on Android 8+. It installs as **MicBridge Preview** alongside the earlier app. The package is `com.jerry.micbridge.preview`, version code 9, with a separate test certificate and independent settings. You do not need to remove your existing MicBridge app.
+
+Select both devices in Live, start muted at low volume, then open **Studio → Try Synthetic Overlord**. Adjust **Creative effects → Metallic layers** to taste. Reduce Robot texture for more natural consonants; set Pitch to 0 and Echo blend to 0 for a less delayed character effect. The earlier beta below does not contain this preset.
+
+SHA-256: `1180ccf7bf4e30503ba6d1feb1af9c0f45e22944bd5ff590f32317433627b2ae`.
+
+## Earlier 0.5.1 beta download
 
 Download [MicBridge 0.5.1 beta](../dist/MicBridge-0.5.1-beta.apk), open the GitHub file page and choose **Download raw file**. The repository is public; a GitHub account is not required to download the APK. Android 8.0+ is required. The APK is a test build, not a Play Store release.
 

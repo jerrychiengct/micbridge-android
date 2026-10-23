@@ -12,7 +12,7 @@ The strongest demonstration is an everyday problem: someone needs to speak to a 
 
 ## Short English description
 
-MicBridge turns your Android phone into a live speech and voice-effects tool. Use the built-in microphone or a compatible wired, USB or wireless receiver microphone, then send your voice to a connected speaker. Speech presets, adjustable EQ, live monitoring and 16 original voice presets give you control over your sound. Download the free public beta, try your setup and help shape what comes next.
+MicBridge turns your Android phone into a live speech and voice-effects tool. Use the built-in microphone or a compatible wired, USB or wireless receiver microphone, then send your voice to a connected speaker. Speech presets, adjustable EQ, live monitoring and 17 original voice presets give you control over your sound. Download the free public beta, try your setup and help shape what comes next.
 
 ## Penerangan ringkas Bahasa Malaysia
 
@@ -23,7 +23,7 @@ Nak bercakap kepada kumpulan kecil menggunakan telefon dan speaker yang anda sud
 1. **A practical use for existing equipment:** phone microphone plus a compatible speaker, with optional external microphone inputs.
 2. **Speech first:** Lecture and Studio Speech presets, voice care and adjustable bass/mid/treble.
 3. **An engaging visual demo:** live level meter, selectable audio routes and immediate control over sound.
-4. **Creative variety:** 16 original presets plus pitch, grit, robot and echo controls.
+4. **Creative variety:** 17 original presets plus pitch, grit, robot and echo controls.
 5. **Community participation:** a public beta with direct developer feedback, collaboration opportunities and no brand whitelist.
 
 ## Suggested 45–60 second demonstration
@@ -57,3 +57,7 @@ Keep the speaker away from the microphone. Start at low volume and muted. Captur
 **Optional project support:** https://ko-fi.com/jerrychiengct
 
 Original logo assets: [PNG](../branding/micbridge-icon.png) · [SVG](../branding/micbridge-icon.svg). Existing interface illustrations are labelled design references, not installed-app screenshots. Capture genuine app screenshots and real audio for reviews.
+
+## New voice preview
+
+[Synthetic Overlord in 0.6.0 Preview](SYNTHETIC_OVERLORD.md) adds a controllable mechanical character texture. This separate preview package installs alongside 0.5.1; the 0.5.1 download above still has 16 presets. Use the [preview APK](../dist/MicBridge-0.6.0-preview.apk) when demonstrating all 17.

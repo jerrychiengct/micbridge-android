@@ -17,9 +17,19 @@
 
 Need to lead a lesson, run a workshop or give a small presentation? MicBridge turns your Android phone and a compatible speaker into a live speech setup. Speak through your phone's built-in microphone or a compatible external mic, then send your voice to your selected audio output.
 
-Start with **Lecture** for spoken delivery, adjust your sound to suit your voice, or explore **16 original presets** for creative voice effects. MicBridge brings microphone selection, speaker selection, voice controls and live monitoring together in one clean interface.
+Start with **Lecture** for spoken delivery, adjust your sound to suit your voice, or explore **17 original presets** for creative voice effects. MicBridge brings microphone selection, speaker selection, voice controls and live monitoring together in one clean interface.
 
 **[Download the free Android beta](dist/MicBridge-0.5.1-beta.apk)** · Android 8.0+ · No app account required · Audio processed on your phone
+
+## New: Synthetic Overlord voice · 0.6.0 Preview
+
+**[Download MicBridge Preview 0.6.0](dist/MicBridge-0.6.0-preview.apk)** · Android 8.0+ · [Preset and analysis notes](docs/SYNTHETIC_OVERLORD.md)
+
+Add an Ultron-inspired mechanical texture to your own live voice: restrained pitch lowering, gritty body, layered metallic resonance, dual robotic modulation and a short echo. Open **Studio → Try Synthetic Overlord**, then adjust **Creative effects → Metallic layers**. There are now **17 presets**; the existing speech presets remain available.
+
+**This preview installs alongside MicBridge 0.5.1**, under the name **MicBridge Preview** and package `com.jerry.micbridge.preview`. It uses a separate test signing key because the earlier beta key could not be recovered after workspace cleanup. It does not upgrade or replace your installed 0.5.x app, and settings are separate. The source now builds this preview package; the earlier 0.5.1 APK remains linked below.
+
+The effect is an original DSP approximation, not an exact character/actor voice or an AI voice clone. The supplied reference recording is not included. Pitch processing and audible echoes affect timing; hardware listening and latency testing are still needed.
 
 ## Why try MicBridge?
 
@@ -76,14 +86,14 @@ Keep MicBridge visible during playback. [Full installation guide and troubleshoo
 | Choose your output | Generic Bluetooth speakers, named brands, wired / USB audio and the phone speaker |
 | Speech voice care | Gentle noise reduction, microphone noise-floor calibration, bounded level assist and de-essing |
 | Shape your sound | Independent bass, mid and treble, warm/bright tone, pitch, grit, robot texture and echo |
-| 16 original presets | Lecture, Studio Speech, Broadcast, Warm Narrator, Vigilante and more |
+| 17 original presets | Lecture, Studio Speech, Broadcast, Warm Narrator, Vigilante and more |
 | Latency controls | Native burst or approximately 5 ms Fast blocks, bounded capture backlog and adaptive output buffers |
 | Live monitoring | Input-level history, clipping indication, actual-route checks, persistent Mute and Stop controls |
 | Local processing | No microphone recordings, cloud processing, advertising or analytics |
 
 ## Refined interface in 0.5.0
 
-A quieter charcoal and mint palette, large page titles, soft grouped cards and original outline icons give the native Android app an iOS-inspired visual style. Studio offers four quick presets, the full 16-preset collection and expandable creative controls. Device labels wrap, controls scale with text, and each tab remembers its scroll position.
+A quieter charcoal and mint palette, large page titles, soft grouped cards and original outline icons give the native Android app an iOS-inspired visual style. Studio offers four quick presets, the full 17-preset collection and expandable creative controls. Device labels wrap, controls scale with text, and each tab remembers its scroll position.
 
 ![MicBridge 0.5.0 design reference](docs/assets/ui-design-0.5.0.png)
 

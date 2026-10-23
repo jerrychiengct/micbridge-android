@@ -32,7 +32,7 @@ public final class MainActivity extends Activity implements AudioEngine.Listener
     private MeterView meter;
     private final LinearLayout[] pages=new LinearLayout[4]; private LinearLayout catalogCards;
     private ScrollView scroll; private Switch bypass,clarity,speech,autoLevel,fast;
-    private Slider gain,pitch,tone,bass,mid,treble,growl,robot,echo,delay,noise,deEss;
+    private Slider gain,pitch,tone,bass,mid,treble,growl,robot,echo,delay,noise,deEss,metal;
     private boolean active,ready,calibrating,isMuted=true,destroyed,changing;
     private int liveInputId=-1,liveOutputId=-1,presetIndex=6,selectedPage=-1;
     private final int[] pageScroll=new int[4];
@@ -138,7 +138,8 @@ public final class MainActivity extends Activity implements AudioEngine.Listener
         LinearLayout choices=card(page);choices.addView(text("YOUR PRESET",10,SUB));presetName=heading("Natural",23);choices.addView(presetName);
         int[] featured={6,8,0,7};
         for(int row=0;row<2;row++){LinearLayout line=new LinearLayout(this);for(int col=0;col<2;col++){final int index=featured[row*2+col];Button p=button(presetTitles[index],BG);presets[index]=p;LinearLayout.LayoutParams lp=new LinearLayout.LayoutParams(0,-2,1);lp.setMargins(col==0?0:dp(4),dp(8),col==0?dp(4):0,0);line.addView(p,lp);p.setOnClickListener(v->applyPreset(index));}choices.addView(line);}
-        Button browse=button("Explore all 16 presets",PAPER);browse.setTextColor(TEAL);fullButton(choices,browse);browse.setOnClickListener(v->{String[] labels=new String[presetTitles.length];for(int i=0;i<labels.length;i++)labels[i]=presetTitles[i]+" · "+presetHints[i];AlertDialog picker=new AlertDialog.Builder(this).setTitle("Preset collection").setSingleChoiceItems(labels,presetIndex,(dialog,index)->{applyPreset(index);dialog.dismiss();}).setNegativeButton("Done",null).create();picker.show();});
+        Button browse=button("Explore all "+presetTitles.length+" presets",PAPER);browse.setTextColor(TEAL);fullButton(choices,browse);browse.setOnClickListener(v->{String[] labels=new String[presetTitles.length];for(int i=0;i<labels.length;i++)labels[i]=presetTitles[i]+" · "+presetHints[i];AlertDialog picker=new AlertDialog.Builder(this).setTitle("Preset collection").setSingleChoiceItems(labels,presetIndex,(dialog,index)->{applyPreset(index);dialog.dismiss();}).setNegativeButton("Done",null).create();picker.show();});
+        Button overlord=button("Try Synthetic Overlord",PALE);fullButton(choices,overlord);overlord.setOnClickListener(v->applyPreset(16));
         LinearLayout controls=card(page);controls.addView(heading("Sound shaping",19));
         bypass=toggle("Voice effects");bypass.setChecked(true);controls.addView(bypass);
         pitch=new Slider(controls,"Pitch",12,6,p->String.format(Locale.UK,"≈ %+d semitones",p-6));
@@ -149,6 +150,7 @@ public final class MainActivity extends Activity implements AudioEngine.Listener
         treble=new Slider(equaliser,"Treble · 4 kHz",24,12,p->String.format(Locale.UK,"%+d dB",p-12));
         LinearLayout creative=card(page);creativeToggle=button("Creative effects   +",PAPER);creativeToggle.setGravity(Gravity.START|Gravity.CENTER_VERTICAL);creativeToggle.setTextSize(19);creative.addView(creativeToggle,new LinearLayout.LayoutParams(-1,-2));creativeBody=vertical();creative.addView(creativeBody);creativeExpanded(false);creativeToggle.setOnClickListener(v->creativeExpanded(creativeBody.getVisibility()!=View.VISIBLE));
         growl=new Slider(creativeBody,"Grit / growl",100,0,p->p+"%");
+        metal=new Slider(creativeBody,"Metallic layers",100,0,p->p+"%");
         robot=new Slider(creativeBody,"Robot texture",100,0,p->p+"%");
         echo=new Slider(creativeBody,"Echo blend",50,0,p->p+"%");
         delay=new Slider(creativeBody,"Echo timing",500,150,p->(p+100)+" ms");
@@ -159,11 +161,11 @@ public final class MainActivity extends Activity implements AudioEngine.Listener
         noise=new Slider(care,"Soft noise reduction",100,0,p->p+"%");
         deEss=new Slider(care,"Tame sharp S sounds",100,0,p->p+"%");
         Runnable change=()->{if(!changing){presetIndex=-1;updateEffects();}};
-        noise.setOnChange(change);deEss.setOnChange(change);autoLevel.setOnCheckedChangeListener((b,on)->change.run());pitch.setOnChange(change);tone.setOnChange(change);bass.setOnChange(change);mid.setOnChange(change);treble.setOnChange(change);growl.setOnChange(change);robot.setOnChange(change);echo.setOnChange(change);delay.setOnChange(change);
+        metal.setOnChange(change);noise.setOnChange(change);deEss.setOnChange(change);autoLevel.setOnCheckedChangeListener((b,on)->change.run());pitch.setOnChange(change);tone.setOnChange(change);bass.setOnChange(change);mid.setOnChange(change);treble.setOnChange(change);growl.setOnChange(change);robot.setOnChange(change);echo.setOnChange(change);delay.setOnChange(change);
         bypass.setOnCheckedChangeListener((b,on)->{if(!changing)updateEffects();});clarity.setOnCheckedChangeListener((b,on)->change.run());speech.setOnCheckedChangeListener((b,on)->change.run());
         fxSummary=text("Natural voice • effects add no intentional delay",12,SUB);care.addView(fxSummary);
         Button reset=button("Reset to natural voice",PALE);fullButton(care,reset);reset.setOnClickListener(v->applyPreset(0));
-        page.addView(text("Lecture keeps your natural pitch, removes rumble and gently levels louder speech. Vigilante is a Batman-inspired creative effect, not an exact character or actor voice. Pitch is an approximate beta effect. The limiter reduces digital clipping; it cannot prevent feedback.",12,SUB));
+        page.addView(text("Lecture keeps your natural pitch, removes rumble and gently levels louder speech. Vigilante is a Batman-inspired creative effect, not an exact character or actor voice. Synthetic Overlord adds an Ultron-inspired mechanical texture to your own voice; it is not an exact actor voice. Pitch is an approximate beta effect. The limiter reduces digital clipping; it cannot prevent feedback.",12,SUB));
     }
     private void buildSpeakers(LinearLayout page) {
         pageTitle(page,"Speakers","Your favourite speaker. Any brand.");
@@ -190,7 +192,7 @@ public final class MainActivity extends Activity implements AudioEngine.Listener
         if(found==0)catalogCards.addView(text("No examples found. You can still connect an unlisted Bluetooth media speaker.",14,SUB));
     }
     private void buildAbout(LinearLayout page){
-        pageTitle(page,"About MicBridge","An independent voice studio. Made with care.");page.addView(text("Version 0.5.1 beta · Android 8+",12,SUB));
+        pageTitle(page,"About MicBridge","An independent voice studio. Made with care.");page.addView(text("Version 0.6.0 preview · Android 8+",12,SUB));
         LinearLayout creator=card(page);creator.addView(heading("Created by",16));creator.addView(heading(AppInfo.CREATOR,22));creator.addView(text("An independent project to make live speech amplification and creative voice tools more accessible. Built for lectures, presentations and everyday voice experiments.",14,SUB));
         LinearLayout support=card(page);support.addView(heading("Support the project",20));support.addView(text("Visit my GitHub to follow development. You can support the project on Ko-fi, or email me personally. Support is voluntary; Ko-fi opens in your browser.",14,SUB));
         Button kofi=button("Support on Ko-fi",TEAL);fullButton(support,kofi);kofi.setOnClickListener(v->openExternal(new Intent(Intent.ACTION_VIEW,Uri.parse(AppInfo.KOFI))));
@@ -207,7 +209,7 @@ public final class MainActivity extends Activity implements AudioEngine.Listener
         catch(ActivityNotFoundException error){android.content.ClipboardManager clipboard=(android.content.ClipboardManager)getSystemService(CLIPBOARD_SERVICE);clipboard.setPrimaryClip(ClipData.newPlainText("MicBridge creator email",AppInfo.EMAIL));Toast.makeText(this,"Email address copied: "+AppInfo.EMAIL,Toast.LENGTH_LONG).show();}
     }
     private void emailFeedback(){
-        String body="MicBridge 0.5.1 beta feedback\n\nPhone and Android version: \nMicrophone and adapter: \nSpeaker and connection type: \nFast or Balanced mode: \nPreset and gain: \nDelay and sound quality: \nSession length and stability: \nUnderruns / capture backlog trimmed: \nMy experience, bugs or feature requests: \n";
+        String body="MicBridge 0.6.0 preview feedback\n\nPhone and Android version: \nMicrophone and adapter: \nSpeaker and connection type: \nFast or Balanced mode: \nPreset and gain: \nDelay and sound quality: \nSession length and stability: \nUnderruns / capture backlog trimmed: \nMy experience, bugs or feature requests: \n";
         try{startActivity(new Intent(Intent.ACTION_SENDTO,Uri.parse("mailto:"+AppInfo.EMAIL+"?subject="+Uri.encode("MicBridge — beta feedback and requests")+"&body="+Uri.encode(body))));}
         catch(ActivityNotFoundException error){emailCreator("MicBridge — beta feedback and requests");}
     }
@@ -226,11 +228,11 @@ public final class MainActivity extends Activity implements AudioEngine.Listener
     private void applyPreset(int index) {
         EffectSettings fx=VoicePresets.get(index);changing=true;presetIndex=index;bypass.setChecked(true);clarity.setChecked(fx.clarity);speech.setChecked(fx.speech);autoLevel.setChecked(fx.autoLevel);
         pitch.value(Math.round(fx.pitch)+6);tone.value(Math.round(fx.tone)+6);bass.value(Math.round(fx.bass)+12);mid.value(Math.round(fx.mid)+12);treble.value(Math.round(fx.treble)+12);
-        growl.value(Math.round(fx.growl*100));robot.value(Math.round(fx.robot*100));echo.value(Math.round(fx.echo*100));delay.value(fx.echoMillis-100);noise.value(Math.round(fx.noise*100));deEss.value(Math.round(fx.deEss*100));changing=false;updateEffects();creativeExpanded(fx.pitch!=0||fx.growl>0||fx.robot>0||fx.echo>0);
+        metal.value(Math.round(fx.metal*100));growl.value(Math.round(fx.growl*100));robot.value(Math.round(fx.robot*100));echo.value(Math.round(fx.echo*100));delay.value(fx.echoMillis-100);noise.value(Math.round(fx.noise*100));deEss.value(Math.round(fx.deEss*100));changing=false;updateEffects();creativeExpanded(fx.pitch!=0||fx.growl>0||fx.robot>0||fx.echo>0||fx.metal>0);
     }
     private void updateEffects() {
-        engine.setEffects(new EffectSettings(bypass.isChecked(),clarity.isChecked(),pitch.value()-6,tone.value()-6,bass.value()-12,mid.value()-12,treble.value()-12,growl.value()/100f,speech.isChecked(),robot.value()/100f,echo.value()/100f,delay.value()+100,noise.value()/100f,deEss.value()/100f,autoLevel.isChecked()));
-        for(Slider control:new Slider[]{pitch,tone,bass,mid,treble,growl,robot,echo,delay,noise,deEss}){enabled(control.bar,bypass.isChecked());control.label.setAlpha(bypass.isChecked()?1f:0.5f);}
+        engine.setEffects(new EffectSettings(bypass.isChecked(),clarity.isChecked(),pitch.value()-6,tone.value()-6,bass.value()-12,mid.value()-12,treble.value()-12,growl.value()/100f,speech.isChecked(),robot.value()/100f,echo.value()/100f,delay.value()+100,noise.value()/100f,deEss.value()/100f,autoLevel.isChecked(),metal.value()/100f));
+        for(Slider control:new Slider[]{pitch,tone,bass,mid,treble,growl,robot,echo,delay,noise,deEss,metal}){enabled(control.bar,bypass.isChecked());control.label.setAlpha(bypass.isChecked()?1f:0.5f);}
         enabled(clarity,bypass.isChecked());enabled(speech,bypass.isChecked());enabled(autoLevel,bypass.isChecked());
         String title=presetIndex>=0?presetTitles[presetIndex]:"Custom voice";presetName.setText(title);
         for(int i=0;i<presetTitles.length;i++){if(presets[i]!=null){surface(presets[i],i==presetIndex?PALE:BG,14);presets[i].setTextColor(i==presetIndex?TEAL:INK);presets[i].setSelected(i==presetIndex);}}
@@ -239,10 +241,10 @@ public final class MainActivity extends Activity implements AudioEngine.Listener
     private void restoreSettings() {
         changing=true;presetIndex=prefs.getInt("preset",6);if(presetIndex>=presetTitles.length||presetIndex < -1)presetIndex=6;
         EffectSettings defaults=VoicePresets.get(presetIndex);noise.value(prefs.getInt("noise",Math.round(defaults.noise*100)));deEss.value(prefs.getInt("deEss",Math.round(defaults.deEss*100)));autoLevel.setChecked(prefs.getBoolean("autoLevel",defaults.autoLevel));fast.setChecked(prefs.getBoolean("fast",true));engine.setPreferFast(fast.isChecked());
-        gain.value(prefs.getInt("gain",90));pitch.value(prefs.getInt("pitch",6));tone.value(prefs.getInt("tone",6));bass.value(prefs.getInt("bass",12));mid.value(prefs.getInt("mid",12));treble.value(prefs.getInt("treble",12));growl.value(prefs.getInt("growl",0));speech.setChecked(prefs.getBoolean("speech",false));robot.value(prefs.getInt("robot",0));echo.value(prefs.getInt("echo",0));delay.value(prefs.getInt("delay",150));bypass.setChecked(prefs.getBoolean("fx",true));clarity.setChecked(prefs.getBoolean("clarity",false));changing=false;updateEffects();engine.setGain(0.1f+gain.value()/100f);if(!prefs.contains("preset"))applyPreset(6);else creativeExpanded(growl.value()>0||robot.value()>0||echo.value()>0);
+        metal.value(prefs.getInt("metal",Math.round(defaults.metal*100)));gain.value(prefs.getInt("gain",90));pitch.value(prefs.getInt("pitch",6));tone.value(prefs.getInt("tone",6));bass.value(prefs.getInt("bass",12));mid.value(prefs.getInt("mid",12));treble.value(prefs.getInt("treble",12));growl.value(prefs.getInt("growl",0));speech.setChecked(prefs.getBoolean("speech",false));robot.value(prefs.getInt("robot",0));echo.value(prefs.getInt("echo",0));delay.value(prefs.getInt("delay",150));bypass.setChecked(prefs.getBoolean("fx",true));clarity.setChecked(prefs.getBoolean("clarity",false));changing=false;updateEffects();engine.setGain(0.1f+gain.value()/100f);if(!prefs.contains("preset"))applyPreset(6);else creativeExpanded(growl.value()>0||robot.value()>0||echo.value()>0||metal.value()>0);
     }
     private void saveSettings() {
-        prefs.edit().putInt("noise",noise.value()).putInt("deEss",deEss.value()).putBoolean("autoLevel",autoLevel.isChecked()).putBoolean("fast",fast.isChecked()).putInt("preset",presetIndex).putInt("gain",gain.value()).putInt("pitch",pitch.value()).putInt("tone",tone.value()).putInt("bass",bass.value()).putInt("mid",mid.value()).putInt("treble",treble.value()).putInt("growl",growl.value()).putBoolean("speech",speech.isChecked()).putInt("robot",robot.value()).putInt("echo",echo.value()).putInt("delay",delay.value()).putBoolean("fx",bypass.isChecked()).putBoolean("clarity",clarity.isChecked()).apply();
+        prefs.edit().putInt("metal",metal.value()).putInt("noise",noise.value()).putInt("deEss",deEss.value()).putBoolean("autoLevel",autoLevel.isChecked()).putBoolean("fast",fast.isChecked()).putInt("preset",presetIndex).putInt("gain",gain.value()).putInt("pitch",pitch.value()).putInt("tone",tone.value()).putInt("bass",bass.value()).putInt("mid",mid.value()).putInt("treble",treble.value()).putInt("growl",growl.value()).putBoolean("speech",speech.isChecked()).putInt("robot",robot.value()).putInt("echo",echo.value()).putInt("delay",delay.value()).putBoolean("fx",bypass.isChecked()).putBoolean("clarity",clarity.isChecked()).apply();
     }
     private boolean hasPermissions(){return checkSelfPermission(Manifest.permission.RECORD_AUDIO)==PackageManager.PERMISSION_GRANTED&&(Build.VERSION.SDK_INT<31||checkSelfPermission(Manifest.permission.BLUETOOTH_CONNECT)==PackageManager.PERMISSION_GRANTED);}
     private void ensurePermissions(){List<String> p=new ArrayList<>();if(checkSelfPermission(Manifest.permission.RECORD_AUDIO)!=PackageManager.PERMISSION_GRANTED)p.add(Manifest.permission.RECORD_AUDIO);if(Build.VERSION.SDK_INT>=31&&checkSelfPermission(Manifest.permission.BLUETOOTH_CONNECT)!=PackageManager.PERMISSION_GRANTED)p.add(Manifest.permission.BLUETOOTH_CONNECT);if(!p.isEmpty())requestPermissions(p.toArray(new String[0]),1);else refreshDevices();}

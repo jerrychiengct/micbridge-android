@@ -15,7 +15,7 @@ public final class VoiceCareTest {
         short[] mono=new short[3];check(AudioRoutePlan.downmix(new short[]{32767,32767,-32768,-32768,32767,-32768},6,2,mono)==3,"Stereo frames");check(mono[0]==32767&&mono[1]==-32768&&mono[2]==0,"Downmix without integer overflow");
         boolean invalid=false;try{AudioRoutePlan.downmix(new short[3],3,2,mono);}catch(IllegalArgumentException e){invalid=true;}check(invalid,"Incomplete stereo frame rejected");
         check(AudioRoutePlan.growBuffer(900,480,1000)==1000,"Underrun recovery capped to capacity");
-        check(VoicePresets.TITLES.length==16&&VoicePresets.HINTS.length==16,"Preset metadata");
+        check(VoicePresets.TITLES.length==17&&VoicePresets.HINTS.length==17,"Preset metadata");
         for(int rate:new int[]{8000,16000,32000,44100,48000,96000}){
             for(boolean fast:new boolean[]{true,false}){
                 check(AudioRoutePlan.blockFrames(rate,fast)>0,"Usable processing block");
@@ -27,7 +27,7 @@ public final class VoiceCareTest {
                 check(Arrays.equals(render(speech,rate,EffectSettings.natural(),0.003f,fast),speech),"Neutral path unity at negotiated rate");
                 double calibrated=rms(render(sine(rate,500,300),rate,care(1,0,false),0.010f,fast));double uncalibrated=rms(render(sine(rate,500,300),rate,care(1,0,false),0.003f,fast));check(calibrated<uncalibrated*0.7,"Calibrated floor changes noise suppression");
             }
-            for(int preset=0;preset<16;preset++){
+            for(int preset=0;preset<VoicePresets.TITLES.length;preset++){
                 short[] processed=render(sine(rate,1000,12000),rate,VoicePresets.get(preset),0.003f,true);check(rms(processed)>80,"Preset audible "+preset+" / "+rate);for(short sample:processed)check(Math.abs((int)sample)<=29490,"Preset bounded");
             }
         }
@@ -36,6 +36,6 @@ public final class VoiceCareTest {
             EffectSettings bypass=new EffectSettings(false,true,6,6,12,12,12,1,true,1,0.5f,250,1,1,true);check(Arrays.equals(render(low,rate,bypass,0.003f,true),low),"Bypass ignores voice care");
             SignalProcessor dsp=new SignalProcessor(rate);short[] in=new short[240],out=new short[480];Arrays.fill(in,(short)8000);dsp.process(in,in.length,out,1,false,VoicePresets.get(6));dsp.process(in,in.length,out,1,true,VoicePresets.get(6));Arrays.fill(in,(short)0);for(int k=0;k<30;k++){dsp.process(in,in.length,out,1,false,VoicePresets.get(6));for(short x:out)check(x==0,"Mute clears voice-care state");}
         }
-        System.out.println("PASS: format negotiation, stereo downmix, bounded buffer recovery; 5/10 ms blocks, noise expansion, calibrated floor, no floor-only boost, level assist, all 16 presets at six sample rates; selective de-essing, bypass and mute.");
+        System.out.println("PASS: format negotiation, stereo downmix, bounded buffer recovery; 5/10 ms blocks, noise expansion, calibrated floor, no floor-only boost, level assist, all 17 presets at six sample rates; selective de-essing, bypass and mute.");
     }
 }

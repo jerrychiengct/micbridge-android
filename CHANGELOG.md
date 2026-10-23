@@ -1,5 +1,14 @@
 # Changelog
 
+## 0.6.0 Preview — 23 October 2026
+
+- Added Synthetic Overlord, an original Ultron-inspired metallic voice effect; 17 presets total, with earlier indices/tunings preserved.
+- Added causal damped comb resonances, dual 47/89 Hz ring layers and a retained dry component, with adjustable/persisted Metallic layers and a quick Studio button.
+- Reference recording analysed locally; no sample audio or actor model included.
+- All five regression suites passed, including new spectral, stability, timing, bypass and mute tests at 8–192 kHz.
+- Signed and verified SDK 35 preview APK, version code 9. Separate package com.jerry.micbridge.preview installs alongside 0.5.x because the original beta signing key was unavailable. Source builds the preview package; settings are separate.
+- Physical audition, Android runtime routing and total acoustic latency remain unverified.
+
 ## 0.5.1 beta — 4 October 2026
 
 - Public testing invitation for Android-compatible microphones and speakers across brands, including generic devices and wireless microphones with compatible USB receivers.
