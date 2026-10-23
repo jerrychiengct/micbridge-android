@@ -3,7 +3,7 @@
 </p>
 
 <p align="center">
-  <a href="dist/MicBridge-0.5.1-beta.apk"><strong>Download beta APK</strong></a> ·
+  <a href="https://github.com/jerrychiengct/micbridge-android/releases/tag/v0.6.0-preview"><strong>Download 0.6.0 Preview</strong></a> ·
   <a href="mailto:jerrychiengchintung@gmail.com?subject=MicBridge%20beta%20feedback%20and%20requests">Send feedback</a> ·
   <a href="docs/INSTALLATION.md">Get started</a> ·
   <a href="VOICE_PRESETS.md">Voice presets</a> ·
@@ -19,11 +19,11 @@ Need to lead a lesson, run a workshop or give a small presentation? MicBridge tu
 
 Start with **Lecture** for spoken delivery, adjust your sound to suit your voice, or explore **17 original presets** for creative voice effects. MicBridge brings microphone selection, speaker selection, voice controls and live monitoring together in one clean interface.
 
-**[Download the free Android beta](dist/MicBridge-0.5.1-beta.apk)** · Android 8.0+ · No app account required · Audio processed on your phone
+**[Download the free Android preview](https://github.com/jerrychiengct/micbridge-android/releases/tag/v0.6.0-preview)** · Android 8.0+ · No app account required · Audio processed on your phone
 
 ## New: Synthetic Overlord voice · 0.6.0 Preview
 
-**[Download MicBridge Preview 0.6.0](dist/MicBridge-0.6.0-preview.apk)** · Android 8.0+ · [Preset and analysis notes](docs/SYNTHETIC_OVERLORD.md)
+**[Download MicBridge Preview 0.6.0 from GitHub Releases](https://github.com/jerrychiengct/micbridge-android/releases/tag/v0.6.0-preview)** · Android 8.0+ · [Preset and analysis notes](docs/SYNTHETIC_OVERLORD.md)
 
 Add an Ultron-inspired mechanical texture to your own live voice: restrained pitch lowering, gritty body, layered metallic resonance, dual robotic modulation and a short echo. Open **Studio → Try Synthetic Overlord**, then adjust **Creative effects → Metallic layers**. There are now **17 presets**; the existing speech presets remain available.
 
@@ -64,7 +64,9 @@ Created by **Jerry Chieng Chin Tung**. Developers, audio engineers, designers an
 
 Want to show your audience a practical Android experiment? Demonstrate **phone mic → connected speaker**, then compare a speech preset and a creative voice effect. Use real audio, describe your actual setup and invite viewers to try the beta. [Media brief, demo outline and reusable copy →](docs/MEDIA_KIT.md)
 
-## Download and start
+## Earlier beta download and setup
+
+For the new Synthetic Overlord voice, use **0.6.0 Preview** from the release page above and download the APK under **Assets**. The earlier beta below does not contain this preset.
 
 **[Download MicBridge 0.5.1 beta](dist/MicBridge-0.5.1-beta.apk)** · Android 8.0 or newer · 4 October 2026
 
