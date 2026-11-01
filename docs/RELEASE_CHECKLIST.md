@@ -1,3 +1,14 @@
+# 0.7.0 Preview release checks
+
+- [x] Six digital suites: DSP, voice care, device choice, buffer/limiter, metallic processing, session/theme checks.
+- [x] SDK 35 build, version code 10, API 26 minimum, same 0.6.0 preview certificate, alignment and signature checks.
+- [x] Reviewed service-owned capture/focus, explicit visible start, notification controls, route-loss stop, CPU wake-lock release and UI reconnect.
+- [ ] Complete [physical screen-lock tests](BACKGROUND_AUDIO.md), including Bluetooth and wired/USB sessions, notification controls, calls, rotation/theme changes and permission denial.
+- [ ] Capture installed Android theme/Effects screenshots and validate fonts, keyboard, landscape, cutouts and TalkBack.
+- [ ] Measure acoustic latency and run at least a 30-minute speaking session on actual hardware.
+
+This remains a prerelease. Historical checks follow.
+
 # Release readiness
 
 ## 0.5.1 beta: completed in this environment

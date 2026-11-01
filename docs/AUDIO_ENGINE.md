@@ -1,3 +1,7 @@
+# Current session ownership — 0.7.0
+
+AudioSessionService now owns AudioEngine across screen lock and Activity recreation. It registers typed microphone/media-playback foreground operation, focus, route monitoring, notification actions and active-session CPU wake-lock cleanup. The Activity binds only for controls and visible metering. Start occurs while visible; sessions are not automatically resurrected after process death. See [Background audio](BACKGROUND_AUDIO.md) for lifecycle details, Android sources and uncompleted device checks.
+
 # Audio engine
 
 Audio is processed locally. The app first prefers the Android native output rate when both endpoints advertise support (an empty list permits negotiation), then other shared rates, then advertised input rates and common Android conversion fallbacks (48, 44.1, 32, 24, 16, 96, 22.05 and 8 kHz). Supported rates are limited to 8–192 kHz. Mono and stereo capture configurations are attempted:

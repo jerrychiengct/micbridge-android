@@ -3,7 +3,7 @@ package com.jerry.micbridge;
 import android.media.*;
 import android.os.*;
 
-/** Foreground-only live audio. Selected routes must be verified before voice playback. */
+/** Service-owned live audio. Selected routes must be verified before voice playback. */
 public final class AudioEngine {
     public interface Listener {
         void onReady(String route);

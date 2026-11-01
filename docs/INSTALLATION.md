@@ -2,13 +2,19 @@
 
 [← Project overview](../README.md)
 
-## New Synthetic Overlord preview
+## Current 0.7.0 Studio preview
 
-Download [MicBridge Preview 0.6.0](../dist/MicBridge-0.6.0-preview.apk), choose **Download raw file** and open the APK on Android 8+. It installs as **MicBridge Preview** alongside the earlier app. The package is `com.jerry.micbridge.preview`, version code 9, with a separate test certificate and independent settings. You do not need to remove your existing MicBridge app.
+Download [MicBridge Preview 0.7.0](../dist/MicBridge-0.7.0-preview.apk), choose **Download raw file** and open the APK on Android 8+. This updates 0.6.0 Preview using the same package and signing certificate. It remains separate from the older 0.5.x app.
 
-Select both devices in Live, start muted at low volume, then open **Studio → Try Synthetic Overlord**. Adjust **Creative effects → Metallic layers** to taste. Reduce Robot texture for more natural consonants; set Pitch to 0 and Echo blend to 0 for a less delayed character effect. The earlier beta below does not contain this preset.
+- **Effects → Presets:** search all 17 voices or filter Speech/Character; select Synthetic Overlord for the mechanical character effect.
+- **Effects → Sound controls:** EQ, pitch, tone, grit, metallic layers, robot, echo and voice care.
+- **Theme** in the header: Follow system, Studio Light, Graphite Dark or Midnight OLED.
+- **Live → Your workspace:** Simple or Studio. The switch changes control visibility without changing the sound.
+- **Screen lock:** start the session while the app is visible, then lock or switch apps. Allow Notifications for Mute/Unmute and Stop controls. [Complete screen-lock setup and test guide](BACKGROUND_AUDIO.md).
 
-SHA-256: `1180ccf7bf4e30503ba6d1feb1af9c0f45e22944bd5ff590f32317433627b2ae`.
+This preview's lifecycle and themes have digital regression coverage and SDK compilation checks. Physical screen-lock playback and installed UI validation remain required.
+
+Current 0.7.0 APK SHA-256: `96997f2dd77f968dc834b90a76760a2f424e02692d5f19d19cc3b629422d097f`.
 
 ## Earlier 0.5.1 beta download
 
@@ -23,12 +29,12 @@ Open the downloaded APK on your phone. If Android asks, allow installation from 
 3. Pair the Bluetooth speaker and enable **Media audio**. Test ordinary music through it, then stop the music. Wired / USB outputs can also be selected.
 4. Open **Live**, tap **Refresh connected devices**, then select the microphone and audio output.
 5. Start at low physical speaker volume and microphone gain around **1.0×**. Keep the speaker away from the microphone.
-6. Select **Lecture** or **Studio Speech** in **Studio**. Tap **Start session**. MicBridge sends silence while checking the actual audio route.
+6. Select **Lecture** or **Studio Speech** in **Effects**. Tap **Start session**. MicBridge sends silence while checking the actual audio route.
 7. When **Ready · muted** appears, tap **Calibrate background noise**. Stay quiet for 1.5 seconds. You remain muted afterward.
 8. Check the microphone level, then tap **Unmute**. Raise speaker volume gradually. Recalibrate after changing microphone or room.
 9. Assess speech for at least one minute. Tap **Mute now** or **Stop session** when finished.
 
-Phone volume buttons adjust media volume. The app keeps the display awake while active. Playback stops on leaving the app, locking the phone, selected-device removal, an actual-route change or audio-focus loss. Moving between the four tabs keeps the session running. Opening a settings page, website or email app stops it.
+For 0.7.0 Preview, the screen can turn off and the session can continue in the background. Stop, app dismissal, selected-device removal, an actual-route change or audio-focus loss ends it. Earlier 0.5.x/0.6.0 builds require the app to stay visible.
 
 ## Troubleshooting
 
@@ -43,7 +49,7 @@ Phone volume buttons adjust media volume. The app keeps the display awake while 
 | Input clipping | Reduce transmitter or microphone input level. Software cannot repair already-clipped input. |
 | Squeal / feedback | Mute or stop, lower physical speaker volume and increase microphone / speaker separation. |
 | Calibration reports a loud background | Stay quiet and retry. If the room is noisy, reduce noise-reduction strength; it does not remove other voices. |
-| Session stopped after opening a link | Expected: the beta requires the app to remain visible. Return and start a new muted session. |
+| Screen-lock playback stopped | Verify you installed 0.7.0 Preview, started while visible, and have microphone access. Check for a call, route change or device battery restriction; report the actual setup. |
 
 ## Verify the downloaded APK
 

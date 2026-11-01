@@ -1,3 +1,11 @@
+# 0.7.0 Preview validation
+
+All six standalone Java suites passed, including session lifecycle transition guards and all system/light/dark/OLED text/action contrast combinations. Existing DSP, 17-preset, metallic, device-selection and latency/buffering suites remain passing. SDK 35 compilation, minimum API 26, version code 10, alignment and v2/v3 signatures were verified. The certificate matches 0.6.0 Preview.
+
+Source review covered service-owned audio/focus, typed foreground startup, notification actions, route removal, shutdown cleanup, wake-lock lifecycle, UI detach/reconnect, theme recreation, permission handling and late-callback guards. These are source/digital checks; they are not Android runtime or physical playback validation. Complete the [screen-lock hardware test checklist](BACKGROUND_AUDIO.md) and installed UI/font/orientation tests before promoting this preview.
+
+Historical version results follow.
+
 # Latest preview validation — 0.6.0
 
 All five suites passed, including [Synthetic Overlord tests and limits](SYNTHETIC_OVERLORD.md). The preview APK is SDK 35 compiled, aligned and v2/v3 signature-verified, with application ID `com.jerry.micbridge.preview`, launcher `com.jerry.micbridge.MainActivity`, minimum API 26 and version code 9. Its certificate differs from the earlier beta, so it installs alongside that app. The preview signing key has been preserved privately; it is excluded from the repository.

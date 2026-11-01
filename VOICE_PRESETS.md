@@ -1,4 +1,4 @@
-# Original voice presets — MicBridge 0.6.0 Preview
+# Original voice presets — MicBridge 0.7.0 Preview
 
 This collection uses MicBridge's own DSP code and tuning values. No paid preset pack, commercial engine, AI voice model or proprietary plug-in is included. The professional guidance below informed the choice of processors; these settings are our original implementation, not extracted iZotope presets or claims of equivalent studio quality.
 
@@ -28,7 +28,7 @@ Researched 2 October 2026. Hardware / emulator validation is still required.
 
 ## Synthetic Overlord — new preset 17
 
-Ultron-inspired metallic character processing, applied to the user's own voice. Select **Studio → Try Synthetic Overlord**, or choose it in the full preset collection. This is an original sound effect, not an exact actor/character voice, a trained voice model or a soundboard of the reference recording.
+Ultron-inspired metallic character processing, applied to the user's own voice. Select **Effects → Synthetic Overlord**, or choose it in the full preset collection. This is an original sound effect, not an exact actor/character voice, a trained voice model or a soundboard of the reference recording.
 
 | Control | Starting value |
 | --- | --- |
@@ -41,3 +41,5 @@ Ultron-inspired metallic character processing, applied to the user's own voice. 
 | Speech compression / quiet-voice assist | On / off |
 
 Start at low volume. For a lighter effect, reduce Metallic layers and Robot texture; set Pitch to 0 to remove the pitch shifter's delay. Set Echo blend to 0 to remove repeats. Dry speech remains within the metallic processor, but the preset as a whole still uses the existing approximate pitch shifter. Prefer Lecture or Studio Speech when natural lecture delivery matters more than a character effect. [Reference analysis and implementation](docs/SYNTHETIC_OVERLORD.md)
+
+All 17 presets now live under **Effects → Presets**, with name/hint search and All, Speech and Character filters. Open **Sound controls** to tune the selected preset. Switching to sound controls enables Studio workspace; Simple workspace still includes every preset.

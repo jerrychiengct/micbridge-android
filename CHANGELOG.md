@@ -1,5 +1,15 @@
 # Changelog
 
+## 0.7.0 Preview — 1 November 2026
+
+- Moved all 17 presets into a searchable Effects library with Speech/Character filters and separate Presets/Sound controls panels.
+- Added Follow system, Studio Light, Graphite Dark and Midnight OLED themes across native UI surfaces, controls, dialogs and system bars.
+- Added saved Simple/Studio workspace switch; both modes include every preset. No paid tier introduced.
+- Moved capture, focus, route monitoring and active-session wake lock into a typed microphone/media foreground service so Activity stop/screen lock does not itself stop audio.
+- Added notification Mute/Unmute/Stop, calibration guards, explicit visible startup, non-sticky shutdown, task dismissal and interruption handling. UI reconnects after rotation/theme recreation.
+- Added session-state and colour-contrast regression suite; all six suites pass. Signed SDK 35 APK uses version code 10 and the recovered 0.6.0 preview certificate.
+- Physical screen-lock playback, rendered UI and acoustic latency remain unverified; see the new test checklist.
+
 ## 0.6.0 Preview — 23 October 2026
 
 - Added Synthetic Overlord, an original Ultron-inspired metallic voice effect; 17 presets total, with earlier indices/tunings preserved.

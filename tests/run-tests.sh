@@ -4,7 +4,7 @@ cd "$(dirname "$0")/.."
 TASK_TEST_DIR="$(mktemp -d)"
 trap 'rm -rf "$TASK_TEST_DIR"' EXIT
 TASK_SOURCE_DIR="app/src/main/java/com/jerry/micbridge"
-TASK_SOURCES=("$TASK_SOURCE_DIR/SignalProcessor.java" "$TASK_SOURCE_DIR/MetallicVoice.java" "$TASK_SOURCE_DIR/EffectSettings.java" "$TASK_SOURCE_DIR/VoiceEqualizer.java" "$TASK_SOURCE_DIR/VoiceEnhancer.java" "$TASK_SOURCE_DIR/VoicePresets.java" "$TASK_SOURCE_DIR/AudioRoutePlan.java" "$TASK_SOURCE_DIR/DeviceChoices.java" "$TASK_SOURCE_DIR/LiveCaptureQueue.java" "$TASK_SOURCE_DIR/OutputBufferTuner.java" tests/SignalProcessorTest.java tests/VoiceCareTest.java tests/DeviceChoicesTest.java tests/LatencyQualityTest.java tests/MetallicVoiceTest.java)
+TASK_SOURCES=("$TASK_SOURCE_DIR/SessionState.java" "$TASK_SOURCE_DIR/ThemePalette.java" "$TASK_SOURCE_DIR/SignalProcessor.java" "$TASK_SOURCE_DIR/MetallicVoice.java" "$TASK_SOURCE_DIR/EffectSettings.java" "$TASK_SOURCE_DIR/VoiceEqualizer.java" "$TASK_SOURCE_DIR/VoiceEnhancer.java" "$TASK_SOURCE_DIR/VoicePresets.java" "$TASK_SOURCE_DIR/AudioRoutePlan.java" "$TASK_SOURCE_DIR/DeviceChoices.java" "$TASK_SOURCE_DIR/LiveCaptureQueue.java" "$TASK_SOURCE_DIR/OutputBufferTuner.java" tests/SignalProcessorTest.java tests/VoiceCareTest.java tests/DeviceChoicesTest.java tests/LatencyQualityTest.java tests/MetallicVoiceTest.java tests/SessionThemeTest.java)
 if command -v javac >/dev/null; then
     javac --release 17 -d "$TASK_TEST_DIR" "${TASK_SOURCES[@]}"
 else
@@ -17,3 +17,5 @@ java -cp "$TASK_TEST_DIR" DeviceChoicesTest
 java -cp "$TASK_TEST_DIR" LatencyQualityTest
 
 java -cp "$TASK_TEST_DIR" MetallicVoiceTest
+
+java -cp "$TASK_TEST_DIR" SessionThemeTest

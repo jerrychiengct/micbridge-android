@@ -1,3 +1,9 @@
+# Latest preview: 0.7.0 Studio upgrade
+
+[Download 0.7.0 Preview](../dist/MicBridge-0.7.0-preview.apk) · [Background session guide](BACKGROUND_AUDIO.md)
+
+The new interface puts all 17 presets under Effects, adds system/light/dark/OLED themes and a Simple/Studio workspace switch. Screen-lock support is implemented through a foreground audio service and notification controls, but has not been physically tested here. Capture real phone footage and test locked playback before demonstrating it. The 0.7.0 APK updates 0.6.0 Preview using the same signing certificate; both remain separate from the older 0.5.x app. Earlier descriptions below refer to their stated versions.
+
 # MicBridge — media and creator brief
 
 [Project overview](../README.md) · [Download 0.5.1 beta](../dist/MicBridge-0.5.1-beta.apk) · [Setup guide](INSTALLATION.md)

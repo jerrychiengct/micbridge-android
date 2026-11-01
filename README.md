@@ -3,7 +3,7 @@
 </p>
 
 <p align="center">
-  <a href="https://github.com/jerrychiengct/micbridge-android/releases/tag/v0.6.0-preview"><strong>Download 0.6.0 Preview</strong></a> ·
+  <a href="dist/MicBridge-0.7.0-preview.apk"><strong>Download 0.7.0 Preview</strong></a> ·
   <a href="mailto:jerrychiengchintung@gmail.com?subject=MicBridge%20beta%20feedback%20and%20requests">Send feedback</a> ·
   <a href="docs/INSTALLATION.md">Get started</a> ·
   <a href="VOICE_PRESETS.md">Voice presets</a> ·
@@ -19,17 +19,20 @@ Need to lead a lesson, run a workshop or give a small presentation? MicBridge tu
 
 Start with **Lecture** for spoken delivery, adjust your sound to suit your voice, or explore **17 original presets** for creative voice effects. MicBridge brings microphone selection, speaker selection, voice controls and live monitoring together in one clean interface.
 
-**[Download the free Android preview](https://github.com/jerrychiengct/micbridge-android/releases/tag/v0.6.0-preview)** · Android 8.0+ · No app account required · Audio processed on your phone
+**[Download the free Android preview](dist/MicBridge-0.7.0-preview.apk)** · Android 8.0+ · No app account required · Audio processed on your phone
 
-## New: Synthetic Overlord voice · 0.6.0 Preview
+## New in 0.7.0 Preview — Studio upgrade
 
-**[Download MicBridge Preview 0.6.0 from GitHub Releases](https://github.com/jerrychiengct/micbridge-android/releases/tag/v0.6.0-preview)** · Android 8.0+ · [Preset and analysis notes](docs/SYNTHETIC_OVERLORD.md)
+**[Download MicBridge Preview 0.7.0](dist/MicBridge-0.7.0-preview.apk)** · Android 8.0+ · [Screen-lock setup and testing](docs/BACKGROUND_AUDIO.md)
 
-Add an Ultron-inspired mechanical texture to your own live voice: restrained pitch lowering, gritty body, layered metallic resonance, dual robotic modulation and a short echo. Open **Studio → Try Synthetic Overlord**, then adjust **Creative effects → Metallic layers**. There are now **17 presets**; the existing speech presets remain available.
+- **All voices in Effects:** a searchable library of all 17 presets, with All, Speech and Character filters. Natural, Lecture, Studio Speech, Vigilante and Synthetic Overlord are included. Switch between Presets and Sound controls without scrolling through the whole library.
+- **Four appearance choices:** Follow system, Studio Light, Graphite Dark and Midnight OLED. The theme applies to cards, text, actions, dropdowns, dialogs and system-bar appearance.
+- **Simple / Studio workspace:** quick speaking controls or full EQ, creative effects, voice care and diagnostics. Both modes include every preset; switching modes changes the visible controls, not your current sound. This is an interface upgrade, with no paid tier or subscription introduced.
+- **Screen-lock session support:** live audio is owned by a microphone/media foreground service. Start the session while the app is visible, then lock the screen or switch apps. An ongoing notification offers Mute/Unmute and Stop. Allow notifications to see those controls.
 
-**This preview installs alongside MicBridge 0.5.1**, under the name **MicBridge Preview** and package `com.jerry.micbridge.preview`. It uses a separate test signing key because the earlier beta key could not be recovered after workspace cleanup. It does not upgrade or replace your installed 0.5.x app, and settings are separate. The source now builds this preview package; the earlier 0.5.1 APK remains linked below.
+**Updates the existing 0.6.0 Preview in place**, using the same package and recovered preview signing key. It still installs alongside the older 0.5.x app. Settings stay with the preview app.
 
-The effect is an original DSP approximation, not an exact character/actor voice or an AI voice clone. The supplied reference recording is not included. Pitch processing and audible echoes affect timing; hardware listening and latency testing are still needed.
+Screen-lock playback has been implemented and reviewed against Android guidance. Six digital suites and SDK compilation checks passed. **Physical lock/unlock, notification interaction, rendered UI and acoustic latency testing remain open.** Device firmware and battery management can affect long sessions. This is a testing preview, not a production reliability guarantee.
 
 ## Why try MicBridge?
 
@@ -66,7 +69,7 @@ Want to show your audience a practical Android experiment? Demonstrate **phone m
 
 ## Earlier beta download and setup
 
-For the new Synthetic Overlord voice, use **0.6.0 Preview** from the release page above and download the APK under **Assets**. The earlier beta below does not contain this preset.
+For the new Synthetic Overlord voice, use **0.7.0 Preview** from the download above. The earlier beta below does not contain this preset.
 
 **[Download MicBridge 0.5.1 beta](dist/MicBridge-0.5.1-beta.apk)** · Android 8.0 or newer · 4 October 2026
 
@@ -78,7 +81,7 @@ Open the APK link, then choose **Download raw file** on GitHub. This repository 
 4. Choose **Lecture** in **Studio**, then tap **Start session**. The app checks the actual route while muted.
 5. Tap **Calibrate background noise**, stay quiet for 1.5 seconds, then **Unmute**.
 
-Keep MicBridge visible during playback. [Full installation guide and troubleshooting →](docs/INSTALLATION.md)
+The 0.5.x beta requires MicBridge to stay visible; use 0.7.0 Preview for the new background-session architecture. [Full installation guide and troubleshooting →](docs/INSTALLATION.md)
 
 ## What you can do
 
@@ -91,11 +94,13 @@ Keep MicBridge visible during playback. [Full installation guide and troubleshoo
 | 17 original presets | Lecture, Studio Speech, Broadcast, Warm Narrator, Vigilante and more |
 | Latency controls | Native burst or approximately 5 ms Fast blocks, bounded capture backlog and adaptive output buffers |
 | Live monitoring | Input-level history, clipping indication, actual-route checks, persistent Mute and Stop controls |
+| Appearance and workspace | System/light/dark/OLED themes, Simple/Studio controls |
+| Background session | Start in the app, then use notification controls with screen locked |
 | Local processing | No microphone recordings, cloud processing, advertising or analytics |
 
-## Refined interface in 0.5.0
+## Earlier 0.5.0 interface reference
 
-A quieter charcoal and mint palette, large page titles, soft grouped cards and original outline icons give the native Android app an iOS-inspired visual style. Studio offers four quick presets, the full 17-preset collection and expandable creative controls. Device labels wrap, controls scale with text, and each tab remembers its scroll position.
+A quieter charcoal and mint palette, large page titles, soft grouped cards and original outline icons give the native Android app an iOS-inspired visual style. This earlier design used a Studio tab. Version 0.7.0 now uses the searchable Effects library and theme-aware surfaces. Device labels wrap, controls scale with text, and each tab remembers its scroll position.
 
 ![MicBridge 0.5.0 design reference](docs/assets/ui-design-0.5.0.png)
 
@@ -106,7 +111,7 @@ A quieter charcoal and mint palette, large page titles, soft grouped cards and o
 | Tab | Purpose |
 | --- | --- |
 | **Live** | Select microphone and speaker, monitor input, calibrate noise and manage playback |
-| **Studio** | Pick a preset, adjust EQ and effects, or bypass processing |
+| **Effects** | Pick a preset, adjust EQ and effects, or bypass processing |
 | **Speakers** | Read generic Bluetooth instructions and browse examples from 12 brands |
 | **About** | Creator, public GitHub, Ko-fi, feedback / feature-request and collaboration email buttons |
 
@@ -140,12 +145,12 @@ The input and output selectors now use one Android device snapshot, remove repea
 
 | Check | Current status |
 | --- | --- |
-| Android SDK 35 compilation / APK signature | Verified for 0.5.1 |
+| Android SDK 35 compilation / APK signature | Verified for 0.7.0 Preview |
 | Digital audio and format-negotiation tests | Passed; scope documented in [Testing](docs/TESTING.md) |
-| Upgrade signing | Same test certificate as earlier supplied betas |
+| Upgrade signing | Same preview certificate as 0.6.0; separate from 0.5.x |
 | Physical microphone / speaker combinations | Awaiting documented hardware test results |
 | End-to-end acoustic latency | Not yet measured on a physical setup |
-| Foreground operation | App must remain visible; leaving the screen stops the session |
+| Screen-lock operation | Implemented through a foreground service; real-device verification still needed |
 
 [Release checklist](docs/RELEASE_CHECKLIST.md) · [Changelog](CHANGELOG.md) · [Build instructions](docs/BUILDING.md) · [Audio engine](docs/AUDIO_ENGINE.md)
 

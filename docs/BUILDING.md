@@ -31,7 +31,7 @@ MICBRIDGE_TOOLS="$ANDROID_HOME/build-tools/35.0.0" \
 ./build-apk.sh
 ```
 
-Output: `dist/MicBridge-0.6.0-preview.apk`. If no JDK compiler is available, `MICBRIDGE_ECJ` can point to an Eclipse ECJ JAR. Keep the locally generated signing key for consistent updates. Signing keys, SDK paths and build directories are excluded from git.
+Output: `dist/MicBridge-0.7.0-preview.apk`. If no JDK compiler is available, `MICBRIDGE_ECJ` can point to an Eclipse ECJ JAR. Keep the locally generated signing key for consistent updates. Signing keys, SDK paths and build directories are excluded from git.
 
 ## Digital tests
 
@@ -47,7 +47,7 @@ Or use an installed ECJ JAR:
 MICBRIDGE_ECJ=/absolute/path/to/ecj.jar ./tests/run-tests.sh
 ```
 
-The script compiles only the platform-independent DSP / format-planning classes, runs all five test suites and removes its temporary output. These tests do not require an Android device. They do not establish device compatibility or measure acoustic latency; see [Testing](TESTING.md).
+The script compiles only the platform-independent DSP / format-planning classes, runs all six test suites and removes its temporary output. These tests do not require an Android device. They do not establish device compatibility or measure acoustic latency; see [Testing](TESTING.md).
 
 ## Source map
 
@@ -67,4 +67,6 @@ Class filenames after the first row are relative to `app/src/main/java/com/jerry
 
 ## Preview signing and identity
 
-Current source builds `com.jerry.micbridge.preview`, labelled **MicBridge Preview**, version 0.6.0-preview (code 9). It installs alongside the earlier beta and uses separate preferences. The earlier certificate could not be recovered. Keep the newly generated preview signing key privately for consistent future preview upgrades. Never commit keys or backup archives. This is a test certificate, not a production release credential.
+Current source builds `com.jerry.micbridge.preview`, labelled **MicBridge Preview**, version 0.7.0-preview (code 10). It installs alongside the earlier beta and uses separate preferences. The earlier certificate could not be recovered. Keep the newly generated preview signing key privately for consistent future preview upgrades. Never commit keys or backup archives. This is a test certificate, not a production release credential.
+
+The UI now uses ThemePalette, a searchable Effects library and Simple/Studio controls. AudioSessionService owns background audio, AudioSessionClient connects the Activity, and SessionState defines session transitions. The manifest declares foreground microphone/media-playback service types, wake-lock and notification permissions. See [Background audio](BACKGROUND_AUDIO.md) for Android references and device validation.

@@ -19,6 +19,7 @@ public final class StudioIcon extends Drawable {
             case 5:canvas.drawRoundRect(5,5,19,19,2,2,paint);break;
             case 6:canvas.drawRoundRect(9,3,15,14,3,3,paint);canvas.drawArc(6,7,18,18,0,180,false,paint);canvas.drawLine(12,18,12,22,paint);canvas.drawLine(8,22,16,22,paint);break;
             case 7:canvas.drawArc(4,4,20,20,35,285,false,paint);canvas.drawLine(20,4,20,10,paint);canvas.drawLine(20,10,14,10,paint);break;
+            case 10:canvas.drawCircle(12,12,4,paint);for(int i=0;i<8;i++){double angle=i*Math.PI/4;canvas.drawLine(12+(float)Math.cos(angle)*7,12+(float)Math.sin(angle)*7,12+(float)Math.cos(angle)*10,12+(float)Math.sin(angle)*10,paint);}break;
             case 9:canvas.drawLine(6,9,12,15,paint);canvas.drawLine(12,15,18,9,paint);break;
             default:canvas.drawLine(12,3,12,21,paint);canvas.drawLine(12,3,18,9,paint);canvas.drawLine(18,9,6,18,paint);canvas.drawLine(6,6,18,15,paint);canvas.drawLine(18,15,12,21,paint);
         }
